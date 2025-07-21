@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Prediction Platform - Enterprise Edition{% endblock %}</title>
+    
+    <!-- Enhanced Bootstrap with enterprise theme -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #0066cc;
+            --secondary-color: #6f42c1;
+            --success-color: #198754;
+            --warning-color: #fd7e14;
+            --danger-color: #dc3545;
+            --dark-color: #212529;
+            --light-color: #f8f9fa;
+            --enterprise-blue: #003d82;
+            --enterprise-gradient: linear-gradient(135deg, #0066cc 0%, #003d82 100%);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .navbar-enterprise {
+            background: var(--enterprise-gradient);
+            box-shadow: 0 2px 20px rgba(0,102,204,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+        
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem !important;
+            border-radius: 6px;
+            margin: 0 0.2rem;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-1px);
+        }
+        
+        .nav-link.active {
+            background: rgba(255,255,255,0.2);
+            color: white !important;
+        }
+        
+        .enterprise-card {
+            background: rgba(255,255,255,0.95);
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .enterprise-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+        }
+        
+        .feature-highlight {
+            background: var(--enterprise-gradient);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+        }
+        
+        .metric-card {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            color: #6c757d;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-healthy {
+            background: var(--success-color);
+        }
+        
+        .status-warning {
+            background: var(--warning-color);
+        }
+        
+        .status-critical {
+            background: var(--danger-color);
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .enterprise-button {
+            background: var(--enterprise-gradient);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0,102,204,0.3);
+        }
+        
+        .enterprise-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,102,204,0.4);
+            color: white;
+        }
+        
+        .sidebar {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-item {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            color: #495057;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .sidebar-item:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .footer-enterprise {
+            background: var(--dark-color);
+            color: white;
+            padding: 3rem 0;
+            margin-top: 4rem;
+        }
+        
+        .api-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+            background: white;
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+        }
+        
+        .enterprise-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0,102,204,0.3);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .breadcrumb-enterprise {
+            background: transparent;
+            padding: 0;
+            margin-bottom: 2rem;
+        }
+        
+        .breadcrumb-enterprise .breadcrumb-item {
+            color: #6c757d;
+        }
+        
+        .breadcrumb-enterprise .breadcrumb-item.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar-nav {
+                text-align: center;
+                padding-top: 1rem;
+            }
+            
+            .metric-card {
+                margin-bottom: 1rem;
+            }
+            
+            .enterprise-card {
+                margin-bottom: 1.5rem;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="enterprise-spinner"></div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-enterprise">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-brain me-2"></i>AI Platform Enterprise
+            </a>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars text-white"></i>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="modelsDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-brain me-1"></i>AI Models
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/ml-services/lead-scoring">Lead Scoring</a></li>
+                            <li><a class="dropdown-item" href="/ml-services/churn-prediction">Churn Prediction</a></li>
+                            <li><a class="dropdown-item" href="/ml-services/sales-forecast">Sales Forecasting</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/models">Model Gallery</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/api-tester"><i class="fas fa-flask me-1"></i>API Tester</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/monitoring"><i class="fas fa-chart-line me-1"></i>Monitoring</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="docsDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-book me-1"></i>Documentation
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/getting-started">Getting Started</a></li>
+                            <li><a class="dropdown-item" href="/api-docs">API Reference</a></li>
+                            <li><a class="dropdown-item" href="/data-guide">Data Guide</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>
+                            {% if session.username %}{{ session.username }}{% else %}Account{% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% if session.user_id %}
+                                <li><a class="dropdown-item" href="/"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                                <li><a class="dropdown-item" href="/api-docs"><i class="fas fa-key me-2"></i>API Keys</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            {% else %}
+                                <li><a class="dropdown-item" href="/login"><i class="fas fa-sign-in-alt me-2"></i>Login</a></li>
+                                <li><a class="dropdown-item" href="/register"><i class="fas fa-user-plus me-2"></i>Register</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Breadcrumb -->
+    {% block breadcrumb %}
+    <div class="container-fluid mt-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-enterprise">
+                <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+                {% block breadcrumb_items %}{% endblock %}
+            </ol>
+        </nav>
+    </div>
+    {% endblock %}
+    
+    <!-- Main Content -->
+    <main class="container-fluid mt-4">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- API Status Indicator -->
+    <div class="api-status" id="apiStatus">
+        <span class="status-indicator status-healthy"></span>
+        <small><strong>API Online</strong></small>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer-enterprise">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5><i class="fas fa-brain me-2"></i>AI Platform Enterprise</h5>
+                    <p class="text-muted">World-class machine learning platform with enterprise-grade security, monitoring, and scalability.</p>
+                </div>
+                <div class="col-md-2">
+                    <h6>Products</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/ml-services/lead-scoring" class="text-muted">Lead Scoring</a></li>
+                        <li><a href="/ml-services/churn-prediction" class="text-muted">Churn Prediction</a></li>
+                        <li><a href="/ml-services/sales-forecast" class="text-muted">Sales Forecast</a></li>
+                        <li><a href="/models" class="text-muted">Model Gallery</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h6>Resources</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/api-docs" class="text-muted">API Docs</a></li>
+                        <li><a href="/getting-started" class="text-muted">Getting Started</a></li>
+                        <li><a href="/data-guide" class="text-muted">Data Guide</a></li>
+                        <li><a href="/monitoring" class="text-muted">Monitoring</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h6>Tools</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/api-tester" class="text-muted">API Tester</a></li>
+                        <li><a href="/admin" class="text-muted">Admin Panel</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h6>Enterprise</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-muted">Security</a></li>
+                        <li><a href="#" class="text-muted">Compliance</a></li>
+                        <li><a href="#" class="text-muted">Support</a></li>
+                        <li><a href="#" class="text-muted">Enterprise Sales</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="text-muted mb-0">&copy; 2025 AI Platform Enterprise. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="social-links">
+                        <a href="#" class="text-muted me-3"><i class="fab fa-github"></i></a>
+                        <a href="#" class="text-muted me-3"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-muted me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-muted"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Enhanced JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Enterprise Platform JavaScript
+        class EnterprisePlatform {
+            constructor() {
+                this.init();
+                this.startHealthMonitoring();
+                this.setupInteractivity();
+            }
+            
+            init() {
+                // Set active navigation
+                this.setActiveNavigation();
+                
+                // Initialize tooltips
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }
+            
+            setActiveNavigation() {
+                const currentPath = window.location.pathname;
+                const navLinks = document.querySelectorAll('.nav-link');
+                
+                navLinks.forEach(link => {
+                    if (link.getAttribute('href') === currentPath) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+            
+            startHealthMonitoring() {
+                const statusIndicator = document.getElementById('apiStatus');
+                
+                setInterval(async () => {
+                    try {
+                        const response = await fetch('/health');
+                        const data = await response.json();
+                        
+                        if (data.status === 'healthy') {
+                            statusIndicator.innerHTML = `
+                                <span class="status-indicator status-healthy"></span>
+                                <small><strong>API Online</strong></small>
+                            `;
+                        } else {
+                            statusIndicator.innerHTML = `
+                                <span class="status-indicator status-warning"></span>
+                                <small><strong>API Issues</strong></small>
+                            `;
+                        }
+                    } catch (error) {
+                        statusIndicator.innerHTML = `
+                            <span class="status-indicator status-critical"></span>
+                            <small><strong>API Offline</strong></small>
+                        `;
+                    }
+                }, 30000); // Check every 30 seconds
+            }
+            
+            setupInteractivity() {
+                // Smooth scroll for anchor links
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const target = document.querySelector(this.getAttribute('href'));
+                        if (target) {
+                            target.scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                        }
+                    });
+                });
+                
+                // Loading overlay for form submissions
+                document.querySelectorAll('form').forEach(form => {
+                    form.addEventListener('submit', () => {
+                        this.showLoading();
+                    });
+                });
+            }
+            
+            showLoading() {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+            }
+            
+            hideLoading() {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+            
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+                notification.style.cssText = 'top: 20px; right: 20px; z-index: 1060; min-width: 300px;';
+                notification.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 5000);
+            }
+            
+            async apiRequest(url, options = {}) {
+                this.showLoading();
+                
+                try {
+                    const response = await fetch(url, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...options.headers
+                        },
+                        ...options
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Request failed');
+                    }
+                    
+                    return data;
+                } catch (error) {
+                    this.showNotification(error.message, 'danger');
+                    throw error;
+                } finally {
+                    this.hideLoading();
+                }
+            }
+        }
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.enterprise = new EnterprisePlatform();
+        });
+        
+        // Global utilities
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+        
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                window.enterprise.showNotification('Copied to clipboard!', 'success');
+            }).catch(() => {
+                window.enterprise.showNotification('Failed to copy', 'warning');
+            });
+        }
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

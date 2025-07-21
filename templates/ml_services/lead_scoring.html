@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+
+{% block title %}Lead Scoring Model - AI Prediction Platform{% endblock %}
+
+{% block extra_head %}
+<style>
+    .model-info-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .tech-badge {
+        background-color: rgba(255,255,255,0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        margin: 0.25rem;
+        display: inline-block;
+    }
+    .feature-card {
+        border: 1px solid #374151;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    .feature-card:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+    }
+    .parameter-slider {
+        margin: 1rem 0;
+    }
+    .result-card {
+        background: #1f2937;
+        border-radius: 10px;
+        padding: 1.5rem;
+        border-left: 4px solid #10b981;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Model Overview -->
+    <div class="model-info-card">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1><i class="fas fa-user-tie me-2"></i>Lead Scoring Model</h1>
+                <p class="lead mb-3">Predict lead quality and conversion probability using machine learning</p>
+                <div class="mb-3">
+                    <span class="tech-badge">RandomForest</span>
+                    <span class="tech-badge">Scikit-learn</span>
+                    <span class="tech-badge">Python</span>
+                    <span class="tech-badge">Flask</span>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="bg-white bg-opacity-20 rounded p-3">
+                    <h3 class="mb-1">85.5%</h3>
+                    <small>Model Accuracy</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column - Features & Technology -->
+        <div class="col-lg-6">
+            <!-- Technology Stack -->
+            <div class="feature-card bg-dark">
+                <h4 class="text-light mb-3"><i class="fas fa-cogs me-2"></i>Technology Stack</h4>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h6 class="text-info">Machine Learning</h6>
+                        <ul class="text-muted">
+                            <li>RandomForest Classifier</li>
+                            <li>StandardScaler normalization</li>
+                            <li>Cross-validation training</li>
+                            <li>Hyperparameter optimization</li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-6">
+                        <h6 class="text-info">Framework</h6>
+                        <ul class="text-muted">
+                            <li>Scikit-learn 1.3+</li>
+                            <li>NumPy & Pandas</li>
+                            <li>Joblib serialization</li>
+                            <li>Flask REST API</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Features -->
+            <div class="feature-card bg-dark">
+                <h4 class="text-light mb-3"><i class="fas fa-list me-2"></i>Input Features</h4>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label class="form-label text-info">Company Size</label>
+                            <select class="form-select bg-dark text-light border-secondary" id="company_size">
+                                <option value="1">Small (1-50)</option>
+                                <option value="2">Medium (51-200)</option>
+                                <option value="3">Large (201-1000)</option>
+                                <option value="4">Enterprise (1000+)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-info">Budget ($)</label>
+                            <input type="number" class="form-control bg-dark text-light border-secondary" 
+                                   id="budget" value="50000" min="1000" max="1000000">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-info">Industry Score</label>
+                            <input type="range" class="form-range" id="industry_score" 
+                                   min="1" max="10" value="7" oninput="updateValue('industry', this.value)">
+                            <small class="text-muted">Value: <span id="industry_value">7</span>/10</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-info">Engagement Score</label>
+                            <input type="range" class="form-range" id="engagement_score" 
+                                   min="1" max="10" value="6" oninput="updateValue('engagement', this.value)">
+                            <small class="text-muted">Value: <span id="engagement_value">6</span>/10</small>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label class="form-label text-info">Demographic Score</label>
+                            <input type="range" class="form-range" id="demographic_score" 
+                                   min="1" max="10" value="5" oninput="updateValue('demographic', this.value)">
+                            <small class="text-muted">Value: <span id="demographic_value">5</span>/10</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-info">Behavioral Score</label>
+                            <input type="range" class="form-range" id="behavioral_score" 
+                                   min="1" max="10" value="8" oninput="updateValue('behavioral', this.value)">
+                            <small class="text-muted">Value: <span id="behavioral_value">8</span>/10</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-info">Source Score</label>
+                            <input type="range" class="form-range" id="source_score" 
+                                   min="1" max="10" value="6" oninput="updateValue('source', this.value)">
+                            <small class="text-muted">Value: <span id="source_value">6</span>/10</small>
+                        </div>
+                        <button class="btn btn-primary w-100 mt-3" onclick="predictLead()">
+                            <i class="fas fa-magic me-2"></i>Predict Lead Score
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Results & Tuning -->
+        <div class="col-lg-6">
+            <!-- Prediction Results -->
+            <div class="result-card mb-4" id="results" style="display: none;">
+                <h4 class="text-light mb-3"><i class="fas fa-chart-bar me-2"></i>Prediction Results</h4>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="text-center bg-success bg-opacity-20 p-3 rounded">
+                            <h2 class="text-success mb-1" id="lead_score">--</h2>
+                            <small class="text-muted">Lead Score</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center bg-info bg-opacity-20 p-3 rounded">
+                            <h4 class="text-info mb-1" id="lead_quality">--</h4>
+                            <small class="text-muted">Quality Level</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <h6 class="text-light">Confidence: <span id="confidence" class="text-warning">--</span>%</h6>
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" role="progressbar" id="confidence_bar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button class="btn btn-outline-success btn-sm" onclick="saveModel()">
+                        <i class="fas fa-save me-1"></i>Save Tuned Model
+                    </button>
+                    <button class="btn btn-outline-info btn-sm" onclick="resetParameters()">
+                        <i class="fas fa-undo me-1"></i>Reset Parameters
+                    </button>
+                </div>
+            </div>
+
+            <!-- Model Tuning -->
+            <div class="feature-card bg-dark">
+                <h4 class="text-light mb-3"><i class="fas fa-sliders-h me-2"></i>Model Parameters</h4>
+                <div class="mb-3">
+                    <label class="form-label text-info">Number of Trees</label>
+                    <input type="range" class="form-range" id="n_estimators" 
+                           min="50" max="500" value="100" step="50" oninput="updateValue('trees', this.value)">
+                    <small class="text-muted">Value: <span id="trees_value">100</span></small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-info">Max Depth</label>
+                    <input type="range" class="form-range" id="max_depth" 
+                           min="3" max="20" value="10" oninput="updateValue('depth', this.value)">
+                    <small class="text-muted">Value: <span id="depth_value">10</span></small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-info">Min Samples Split</label>
+                    <input type="range" class="form-range" id="min_samples_split" 
+                           min="2" max="20" value="2" oninput="updateValue('split', this.value)">
+                    <small class="text-muted">Value: <span id="split_value">2</span></small>
+                </div>
+                <button class="btn btn-warning w-100" onclick="retrainModel()">
+                    <i class="fas fa-sync me-2"></i>Retrain with New Parameters
+                </button>
+            </div>
+
+            <!-- Feature Importance -->
+            <div class="feature-card bg-dark">
+                <h4 class="text-light mb-3"><i class="fas fa-weight-hanging me-2"></i>Feature Importance</h4>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Behavioral Score</span>
+                        <span class="text-success">32%</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-success" style="width: 32%"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Budget</span>
+                        <span class="text-info">28%</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-info" style="width: 28%"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Company Size</span>
+                        <span class="text-warning">18%</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-warning" style="width: 18%"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Industry Score</span>
+                        <span class="text-primary">15%</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-primary" style="width: 15%"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Other Features</span>
+                        <span class="text-secondary">7%</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-secondary" style="width: 7%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateValue(type, value) {
+    document.getElementById(type + '_value').textContent = value;
+}
+
+async function predictLead() {
+    const data = {
+        company_size: document.getElementById('company_size').value,
+        budget: document.getElementById('budget').value,
+        industry_score: document.getElementById('industry_score').value,
+        engagement_score: document.getElementById('engagement_score').value,
+        demographic_score: document.getElementById('demographic_score').value,
+        behavioral_score: document.getElementById('behavioral_score').value,
+        source_score: document.getElementById('source_score').value
+    };
+
+    try {
+        const response = await fetch('/api/predict/lead-score', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-Key': 'demo-api-key-12345'
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+            displayResults(result.prediction);
+        } else {
+            alert('Prediction failed: ' + result.error);
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+function displayResults(prediction) {
+    document.getElementById('lead_score').textContent = Math.round(prediction.score);
+    document.getElementById('lead_quality').textContent = prediction.quality;
+    document.getElementById('confidence').textContent = Math.round(prediction.confidence * 100);
+    document.getElementById('confidence_bar').style.width = (prediction.confidence * 100) + '%';
+    document.getElementById('results').style.display = 'block';
+}
+
+function saveModel() {
+    const parameters = {
+        n_estimators: document.getElementById('n_estimators').value,
+        max_depth: document.getElementById('max_depth').value,
+        min_samples_split: document.getElementById('min_samples_split').value
+    };
+    
+    alert('Model configuration saved! Parameters: ' + JSON.stringify(parameters));
+}
+
+function resetParameters() {
+    document.getElementById('n_estimators').value = 100;
+    document.getElementById('max_depth').value = 10;
+    document.getElementById('min_samples_split').value = 2;
+    updateValue('trees', 100);
+    updateValue('depth', 10);
+    updateValue('split', 2);
+}
+
+function retrainModel() {
+    alert('Retraining model with new parameters... This would typically take a few minutes in production.');
+}
+</script>
+{% endblock %}

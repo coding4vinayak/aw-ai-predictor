@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h2">
+                <i class="fas fa-cogs me-2"></i>Admin Dashboard
+            </h1>
+            <p class="text-muted">System overview and management</p>
+        </div>
+    </div>
+    
+    <!-- System Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">{{ stats.total_users }}</h4>
+                            <small>Total Users</small>
+                        </div>
+                        <i class="fas fa-users fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">{{ stats.active_users }}</h4>
+                            <small>Active Users</small>
+                        </div>
+                        <i class="fas fa-user-check fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">{{ stats.total_api_keys }}</h4>
+                            <small>API Keys</small>
+                        </div>
+                        <i class="fas fa-key fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">{{ stats.total_plans }}</h4>
+                            <small>Credit Plans</small>
+                        </div>
+                        <i class="fas fa-credit-card fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Analytics Overview -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Usage Analytics (Last 30 Days)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-primary">{{ analytics.total_requests }}</h3>
+                                <small class="text-muted">Total Requests</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-success">{{ analytics.total_credits_used }}</h3>
+                                <small class="text-muted">Credits Used</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-info">{{ analytics.unique_users }}</h3>
+                                <small class="text-muted">Active Users</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-warning">{{ "%.2f"|format(analytics.error_rate) }}%</h3>
+                                <small class="text-muted">Error Rate</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Top Endpoints</h5>
+                </div>
+                <div class="card-body">
+                    {% for endpoint, count in analytics.top_endpoints.items() %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="small">{{ endpoint.split('/')[-1] }}</span>
+                        <span class="badge bg-primary">{{ count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="/admin/users" class="btn btn-outline-primary btn-block mb-2">
+                                <i class="fas fa-users me-2"></i>Manage Users
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="/admin/plans" class="btn btn-outline-success btn-block mb-2">
+                                <i class="fas fa-credit-card me-2"></i>Credit Plans
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="/admin/models" class="btn btn-outline-warning btn-block mb-2">
+                                <i class="fas fa-robot me-2"></i>ML Models
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="/admin/analytics" class="btn btn-outline-info btn-block mb-2">
+                                <i class="fas fa-chart-bar me-2"></i>Analytics
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent API Usage</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>User</th>
+                                    <th>Endpoint</th>
+                                    <th>Credits</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in recent_logs %}
+                                <tr>
+                                    <td class="small">{{ log.timestamp.strftime('%H:%M:%S') }}</td>
+                                    <td class="small">{{ log.user.username if log.user else 'Unknown' }}</td>
+                                    <td class="small">{{ log.endpoint.split('/')[-1] }}</td>
+                                    <td><span class="badge bg-primary">{{ log.credits_used }}</span></td>
+                                    <td>
+                                        {% if log.status_code < 400 %}
+                                        <span class="badge bg-success">Success</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Error</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh dashboard every 30 seconds
+setTimeout(function() {
+    location.reload();
+}, 30000);
+</script>
+{% endblock %}

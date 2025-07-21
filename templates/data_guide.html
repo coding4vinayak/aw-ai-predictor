@@ -1,0 +1,616 @@
+{% extends "base.html" %}
+
+{% block title %}Data Requirements Guide - AI Prediction Platform{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2 mb-0">
+                <i class="fas fa-database me-3"></i>
+                Data Requirements Guide
+            </h1>
+            <a href="/" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation Pills -->
+<div class="row mb-4">
+    <div class="col-12">
+        <ul class="nav nav-pills" id="guide-nav" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="pill" data-bs-target="#overview" type="button" role="tab">
+                    <i class="fas fa-info-circle me-2"></i>Overview
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="formats-tab" data-bs-toggle="pill" data-bs-target="#formats" type="button" role="tab">
+                    <i class="fas fa-file me-2"></i>Data Formats
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="models-tab" data-bs-toggle="pill" data-bs-target="#models" type="button" role="tab">
+                    <i class="fas fa-robot me-2"></i>Model Requirements
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="cleaning-tab" data-bs-toggle="pill" data-bs-target="#cleaning" type="button" role="tab">
+                    <i class="fas fa-broom me-2"></i>Data Cleaning
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="examples-tab" data-bs-toggle="pill" data-bs-target="#examples" type="button" role="tab">
+                    <i class="fas fa-code me-2"></i>Examples
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="tab-content" id="guide-content">
+    <!-- Overview Tab -->
+    <div class="tab-pane fade show active" id="overview" role="tabpanel">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            Data Handling Philosophy
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-shield-alt me-2"></i>
+                            <strong>We Handle Messy Data:</strong> Our platform processes uncleaned data with missing values, inconsistent formats, and quality issues.
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>But We Recommend Cleaning:</strong> Clean, well-formatted data produces significantly better prediction accuracy.
+                        </div>
+
+                        <h6 class="mt-4 mb-3">What We Accept vs. What We Recommend</h6>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Data Aspect</th>
+                                        <th class="text-success">✅ We Accept</th>
+                                        <th class="text-warning">⚠️ We Recommend</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Missing Values</td>
+                                        <td>NULL, empty, "N/A", blank cells</td>
+                                        <td>Complete data or meaningful defaults</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Date Formats</td>
+                                        <td>Mixed formats in same column</td>
+                                        <td>Consistent format (YYYY-MM-DD)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Text Data</td>
+                                        <td>Inconsistent case, special chars</td>
+                                        <td>Normalized, standardized text</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Duplicates</td>
+                                        <td>Duplicate records present</td>
+                                        <td>Deduplicated data</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Outliers</td>
+                                        <td>Extreme values, data entry errors</td>
+                                        <td>Validated, reasonable ranges</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-line me-2"></i>
+                            Impact of Data Quality
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <small class="text-muted">Prediction Accuracy</small>
+                            <div class="progress mb-1">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 60%"></div>
+                            </div>
+                            <small>Raw/Messy Data: ~60%</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">Prediction Accuracy</small>
+                            <div class="progress mb-1">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 78%"></div>
+                            </div>
+                            <small>Partially Cleaned: ~78%</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">Prediction Accuracy</small>
+                            <div class="progress mb-1">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 92%"></div>
+                            </div>
+                            <small>Well Cleaned: ~92%</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-file-alt me-2"></i>
+                            File Specifications
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li><strong>Formats:</strong> CSV, Excel (.xlsx, .xls)</li>
+                            <li><strong>Max Size:</strong> 16MB</li>
+                            <li><strong>Max Rows:</strong> 100,000</li>
+                            <li><strong>Encoding:</strong> UTF-8 (recommended)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Formats Tab -->
+    <div class="tab-pane fade" id="formats" role="tabpanel">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0 text-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Clean Data Example
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <pre><code>company_size,budget,industry_score,engagement_score
+100,50000,4,3
+250,75000,5,4
+50,25000,3,2</code></pre>
+                        <div class="alert alert-success mt-3">
+                            <i class="fas fa-thumbs-up me-2"></i>
+                            Consistent formats, no missing values, clear numeric data
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0 text-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Messy Data (We Handle This)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <pre><code>company_size,budget,industry_score,engagement_score
+"100 employees",50k,4,3
+"250-300",$75000,5,
+,25000,3,2
+"Small company",,3,2</code></pre>
+                        <div class="alert alert-warning mt-3">
+                            <i class="fas fa-tools me-2"></i>
+                            Mixed formats, missing values, inconsistent text - we clean this automatically
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Requirements Tab -->
+    <div class="tab-pane fade" id="models" role="tabpanel">
+        <div class="accordion" id="modelAccordion">
+            <!-- Lead Scoring -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="leadScoring">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLeadScoring">
+                        <i class="fas fa-user-tie me-3"></i>
+                        Lead Scoring Model
+                    </button>
+                </h2>
+                <div id="collapseLeadScoring" class="accordion-collapse collapse show" data-bs-parent="#modelAccordion">
+                    <div class="accordion-body">
+                        <h6>Required Columns (use any of these names):</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <code>company_size</code>, <code>budget</code>, <code>industry_score</code><br>
+                                <code>engagement_score</code>, <code>demographic_score</code><br>
+                                <code>behavioral_score</code>, <code>lead_source</code>
+                            </div>
+                            <div class="col-md-6">
+                                <code>company_revenue</code>, <code>employee_count</code><br>
+                                <code>website_traffic</code>, <code>contact_frequency</code>
+                            </div>
+                        </div>
+                        
+                        <h6 class="mt-3">Data Handling:</h6>
+                        <ul class="list-unstyled">
+                            <li>✓ Missing values filled with median/mode</li>
+                            <li>✓ Text converted to numerical scores</li>
+                            <li>✓ Company size ranges normalized</li>
+                            <li>✓ Currency symbols removed from budget</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Churn Prediction -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="churnPrediction">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseChurnPrediction">
+                        <i class="fas fa-user-times me-3"></i>
+                        Churn Prediction Model
+                    </button>
+                </h2>
+                <div id="collapseChurnPrediction" class="accordion-collapse collapse" data-bs-parent="#modelAccordion">
+                    <div class="accordion-body">
+                        <h6>Required Columns:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <code>customer_tenure</code>, <code>monthly_charges</code><br>
+                                <code>total_charges</code>, <code>contract_type</code><br>
+                                <code>payment_method</code>, <code>customer_age</code>
+                            </div>
+                            <div class="col-md-6">
+                                <code>support_tickets</code>, <code>usage_frequency</code><br>
+                                <code>satisfaction_score</code>, <code>last_interaction_days</code>
+                            </div>
+                        </div>
+                        
+                        <h6 class="mt-3">Data Handling:</h6>
+                        <ul class="list-unstyled">
+                            <li>✓ Missing tenure estimated from other data</li>
+                            <li>✓ Invalid charges set to account average</li>
+                            <li>✓ Missing satisfaction assigned neutral score</li>
+                            <li>✓ Text categories auto-encoded to numbers</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Forecast -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="salesForecast">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSalesForecast">
+                        <i class="fas fa-chart-line me-3"></i>
+                        Sales Forecast Model
+                    </button>
+                </h2>
+                <div id="collapseSalesForecast" class="accordion-collapse collapse" data-bs-parent="#modelAccordion">
+                    <div class="accordion-body">
+                        <h6>Required Columns:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <code>date</code>, <code>sales_amount</code><br>
+                                <code>product_category</code>, <code>region</code><br>
+                                <code>marketing_spend</code>, <code>lead_volume</code>
+                            </div>
+                            <div class="col-md-6">
+                                <code>conversion_rate</code>, <code>seasonal_factor</code><br>
+                                <code>economic_indicator</code>, <code>competitor_activity</code>
+                            </div>
+                        </div>
+                        
+                        <h6 class="mt-3">Data Handling:</h6>
+                        <ul class="list-unstyled">
+                            <li>✓ Missing dates interpolated from sequence</li>
+                            <li>✓ Invalid sales amounts replaced with trends</li>
+                            <li>✓ Missing categories assigned to "Other"</li>
+                            <li>✓ Seasonal adjustments applied automatically</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sentiment Analysis -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="sentimentAnalysis">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSentimentAnalysis">
+                        <i class="fas fa-comment-dots me-3"></i>
+                        Sentiment Analysis Model
+                    </button>
+                </h2>
+                <div id="collapseSentimentAnalysis" class="accordion-collapse collapse" data-bs-parent="#modelAccordion">
+                    <div class="accordion-body">
+                        <h6>Required Columns:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <code>text</code>, <code>customer_id</code><br>
+                                <code>date</code>, <code>product</code><br>
+                                <code>rating</code>, <code>review_source</code>
+                            </div>
+                            <div class="col-md-6">
+                                <code>verified_purchase</code>, <code>helpful_votes</code><br>
+                                <code>review_length</code>, <code>language</code>
+                            </div>
+                        </div>
+                        
+                        <h6 class="mt-3">Data Handling:</h6>
+                        <ul class="list-unstyled">
+                            <li>✓ Empty text skipped with warning</li>
+                            <li>✓ Mixed languages auto-detected</li>
+                            <li>✓ HTML/special characters cleaned</li>
+                            <li>✓ Duplicate reviews flagged but processed</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Keyword Extraction -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="keywordExtraction">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseKeywordExtraction">
+                        <i class="fas fa-tags me-3"></i>
+                        Keyword Extraction Model
+                    </button>
+                </h2>
+                <div id="collapseKeywordExtraction" class="accordion-collapse collapse" data-bs-parent="#modelAccordion">
+                    <div class="accordion-body">
+                        <h6>Required Columns:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <code>text</code>, <code>document_id</code><br>
+                                <code>category</code>, <code>source</code><br>
+                                <code>date_created</code>, <code>language</code>
+                            </div>
+                            <div class="col-md-6">
+                                <code>word_count</code>, <code>importance_score</code><br>
+                                <code>author</code>, <code>topic</code>
+                            </div>
+                        </div>
+                        
+                        <h6 class="mt-3">Data Handling:</h6>
+                        <ul class="list-unstyled">
+                            <li>✓ Short text processed with limited keywords</li>
+                            <li>✓ Multi-language separated by language</li>
+                            <li>✓ Special characters preserved for context</li>
+                            <li>✓ HTML content: tags removed, text extracted</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Cleaning Tab -->
+    <div class="tab-pane fade" id="cleaning" role="tabpanel">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-broom me-2"></i>
+                            Recommended Data Cleaning Steps
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="cleaning-step mb-4">
+                            <h6>1. Handle Missing Values</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong class="text-danger">❌ Avoid:</strong>
+                                    <ul>
+                                        <li>NULL, "", "N/A", "Unknown"</li>
+                                        <li>"TBD", "Coming Soon"</li>
+                                        <li>Random placeholders</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong class="text-success">✅ Better:</strong>
+                                    <ul>
+                                        <li>Remove rows with critical missing data</li>
+                                        <li>Fill with meaningful defaults</li>
+                                        <li>Use median/mode for numerical</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cleaning-step mb-4">
+                            <h6>2. Standardize Formats</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong class="text-danger">❌ Mixed Formats:</strong>
+                                    <ul>
+                                        <li>Dates: "1/1/23", "Jan 1, 2023"</li>
+                                        <li>Money: "$1,000", "1000", "1k"</li>
+                                        <li>Boolean: "Yes", "Y", "True", "1"</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong class="text-success">✅ Consistent:</strong>
+                                    <ul>
+                                        <li>Dates: "2023-01-01"</li>
+                                        <li>Money: 1000 (numeric)</li>
+                                        <li>Boolean: True/False or 1/0</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cleaning-step mb-4">
+                            <h6>3. Remove or Fix Outliers</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong class="text-danger">❌ Problematic:</strong>
+                                    <ul>
+                                        <li>Age: -5, 250, "old"</li>
+                                        <li>Income: -1000, 99999999</li>
+                                        <li>Ratings: 11 (on 1-10 scale)</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong class="text-success">✅ Reasonable:</strong>
+                                    <ul>
+                                        <li>Age: 25, 45, 67</li>
+                                        <li>Income: 35000, 75000, 120000</li>
+                                        <li>Ratings: 1-10 scale respected</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cleaning-step">
+                            <h6>4. Deduplicate Records</h6>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Remove exact duplicate rows, but keep legitimate repeated customers or transactions with different timestamps.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-tools me-2"></i>
+                            Recommended Tools
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>Excel/Google Sheets:</h6>
+                        <ul class="list-unstyled">
+                            <li>• Data validation</li>
+                            <li>• Remove duplicates</li>
+                            <li>• Find & replace</li>
+                            <li>• Sort & filter</li>
+                        </ul>
+
+                        <h6 class="mt-3">Python (Pandas):</h6>
+                        <ul class="list-unstyled">
+                            <li>• <code>dropna()</code></li>
+                            <li>• <code>fillna()</code></li>
+                            <li>• <code>to_datetime()</code></li>
+                            <li>• <code>drop_duplicates()</code></li>
+                        </ul>
+
+                        <h6 class="mt-3">SQL:</h6>
+                        <ul class="list-unstyled">
+                            <li>• <code>COALESCE</code></li>
+                            <li>• <code>NULLIF</code></li>
+                            <li>• <code>TRIM</code></li>
+                            <li>• <code>DISTINCT</code></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Common Errors
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <strong>"No valid data found"</strong><br>
+                            All rows empty or no matching columns
+                        </div>
+                        <div class="alert alert-warning">
+                            <strong>"Too many missing values"</strong><br>
+                            >90% of critical fields empty
+                        </div>
+                        <div class="alert alert-warning">
+                            <strong>"Low prediction confidence"</strong><br>
+                            Data quality issues affecting accuracy
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Examples Tab -->
+    <div class="tab-pane fade" id="examples" role="tabpanel">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-code me-2"></i>
+                            API Usage Examples
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>Single Prediction (with messy data):</h6>
+                        <pre><code class="language-javascript">// Even messy data works - we clean it automatically
+const messyData = {
+    "company_size": "50-100 employees",  // Will be normalized
+    "budget": "$25,000",                 // Currency cleaned  
+    "industry_score": "",                // Will be filled with default
+    "engagement_score": "high"           // Will be converted to number
+};
+
+fetch('/api/predict/lead-score', {
+    method: 'POST',
+    headers: {
+        'X-API-Key': 'your-api-key',
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(messyData)
+});</code></pre>
+
+                        <h6 class="mt-4">File Upload:</h6>
+                        <pre><code class="language-javascript">// Upload CSV with messy data - we handle it
+const formData = new FormData();
+formData.append('file', messyCSVFile);
+formData.append('model_type', 'lead_score');
+
+fetch('/api/upload/', {
+    method: 'POST',
+    headers: {
+        'X-API-Key': 'your-api-key'
+    },
+    body: formData
+});</code></pre>
+
+                        <h6 class="mt-4">Processing Pipeline:</h6>
+                        <ol>
+                            <li><strong>Data Ingestion:</strong> File validation, encoding detection</li>
+                            <li><strong>Quality Assessment:</strong> Missing values, outliers, data types</li>
+                            <li><strong>Auto-Cleaning:</strong> Fill missing, normalize formats, handle outliers</li>
+                            <li><strong>Feature Engineering:</strong> Encoding, scaling, feature creation</li>
+                            <li><strong>Model Prediction:</strong> AI processing with confidence scoring</li>
+                            <li><strong>Results:</strong> Predictions with quality metrics and warnings</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Syntax highlighting for code blocks (optional)
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize any code highlighting libraries here if needed
+});
+</script>
+{% endblock %}

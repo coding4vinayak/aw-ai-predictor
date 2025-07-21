@@ -1,0 +1,594 @@
+{% extends "base.html" %}
+
+{% block title %}Model Gallery - AI Prediction Platform{% endblock %}
+
+{% block extra_head %}
+<style>
+    .model-card {
+        border: 1px solid #374151;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .model-card:hover {
+        border-color: #6366f1;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+    }
+    
+    .model-status {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    
+    .status-deployed { background-color: #10b981; color: white; }
+    .status-trained { background-color: #f59e0b; color: white; }
+    .status-deprecated { background-color: #6b7280; color: white; }
+    .status-training { background-color: #3b82f6; color: white; }
+    
+    .model-version {
+        background-color: #4f46e5;
+        color: white;
+        padding: 0.125rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .metric-badge {
+        background-color: #1f2937;
+        border: 1px solid #374151;
+        padding: 0.5rem;
+        border-radius: 6px;
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .metric-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #10b981;
+    }
+    
+    .metric-label {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        text-transform: uppercase;
+    }
+    
+    .upload-area {
+        border: 2px dashed #6b7280;
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .upload-area:hover {
+        border-color: #6366f1;
+        background-color: rgba(99, 102, 241, 0.05);
+    }
+    
+    .filter-chip {
+        background-color: #374151;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 16px;
+        font-size: 0.875rem;
+        border: none;
+        cursor: pointer;
+        margin: 0.25rem;
+        transition: all 0.2s ease;
+    }
+    
+    .filter-chip:hover,
+    .filter-chip.active {
+        background-color: #6366f1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="text-light mb-1">Model Gallery</h1>
+                    <p class="text-muted mb-0">Manage and deploy your AI models</p>
+                </div>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModelModal">
+                    <i class="fas fa-upload me-2"></i>Upload Model
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="bg-dark p-3 rounded">
+                <h6 class="text-light mb-2">Filter by Type:</h6>
+                <button class="filter-chip active" data-filter="all">All Models</button>
+                <button class="filter-chip" data-filter="lead_scoring">Lead Scoring</button>
+                <button class="filter-chip" data-filter="churn_prediction">Churn Prediction</button>
+                <button class="filter-chip" data-filter="sales_forecast">Sales Forecast</button>
+                <button class="filter-chip" data-filter="healthcare_risk">Healthcare</button>
+                <button class="filter-chip" data-filter="financial_fraud">Finance</button>
+                <button class="filter-chip" data-filter="retail_optimization">Retail</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Grid -->
+    <div class="row" id="modelGrid">
+        <!-- Models will be loaded here -->
+    </div>
+</div>
+
+<!-- Upload Model Modal -->
+<div class="modal fade" id="uploadModelModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Upload New Model</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="uploadModelForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Model Name</label>
+                                <input type="text" class="form-control bg-dark text-light border-secondary" 
+                                       name="model_name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Model Type</label>
+                                <select class="form-select bg-dark text-light border-secondary" 
+                                        name="model_type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="lead_scoring">Lead Scoring</option>
+                                    <option value="churn_prediction">Churn Prediction</option>
+                                    <option value="sales_forecast">Sales Forecast</option>
+                                    <option value="healthcare_risk">Healthcare Risk</option>
+                                    <option value="financial_fraud">Financial Fraud</option>
+                                    <option value="retail_optimization">Retail Optimization</option>
+                                    <option value="custom">Custom</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Version</label>
+                                <input type="text" class="form-control bg-dark text-light border-secondary" 
+                                       name="version" value="1.0.0" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Training Data Size</label>
+                                <input type="number" class="form-control bg-dark text-light border-secondary" 
+                                       name="training_data_size" placeholder="Number of samples">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control bg-dark text-light border-secondary" 
+                                  name="description" rows="3" 
+                                  placeholder="Describe your model's purpose and capabilities"></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Accuracy (%)</label>
+                                <input type="number" class="form-control bg-dark text-light border-secondary" 
+                                       name="accuracy" min="0" max="100" step="0.01">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Precision (%)</label>
+                                <input type="number" class="form-control bg-dark text-light border-secondary" 
+                                       name="precision" min="0" max="100" step="0.01">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Recall (%)</label>
+                                <input type="number" class="form-control bg-dark text-light border-secondary" 
+                                       name="recall" min="0" max="100" step="0.01">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">F1-Score (%)</label>
+                                <input type="number" class="form-control bg-dark text-light border-secondary" 
+                                       name="f1_score" min="0" max="100" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Required Features (comma-separated)</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" 
+                               name="features" 
+                               placeholder="feature1, feature2, feature3">
+                    </div>
+                    
+                    <div class="upload-area mb-3" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                        <p class="text-muted mb-2">Drag and drop model files or click to browse</p>
+                        <input type="file" id="modelFile" name="model_file" accept=".pkl,.joblib,.model" 
+                               style="display: none;" required>
+                        <input type="file" id="scalerFile" name="scaler_file" accept=".pkl,.joblib,.model" 
+                               style="display: none;">
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" name="is_active" id="isActive">
+                        <label class="form-check-label" for="isActive">
+                            Activate model after upload
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Upload Model</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Model Details Modal -->
+<div class="modal fade" id="modelDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="modelDetailsTitle">Model Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modelDetailsBody">
+                <!-- Model details will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let allModels = [];
+let currentFilter = 'all';
+
+// Load models on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadModels();
+    setupEventListeners();
+});
+
+function setupEventListeners() {
+    // Filter chips
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            currentFilter = this.dataset.filter;
+            filterModels();
+        });
+    });
+    
+    // Upload area
+    const uploadArea = document.getElementById('uploadArea');
+    const modelFile = document.getElementById('modelFile');
+    const scalerFile = document.getElementById('scalerFile');
+    
+    uploadArea.addEventListener('click', () => modelFile.click());
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#6366f1';
+    });
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.style.borderColor = '#6b7280';
+    });
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#6b7280';
+        if (e.dataTransfer.files.length > 0) {
+            modelFile.files = e.dataTransfer.files;
+        }
+    });
+    
+    // Upload form
+    document.getElementById('uploadModelForm').addEventListener('submit', uploadModel);
+}
+
+async function loadModels() {
+    try {
+        const response = await fetch('/api/model-gallery/models');
+        const data = await response.json();
+        
+        if (response.ok) {
+            allModels = data.models;
+            renderModels(allModels);
+        } else {
+            console.error('Error loading models:', data.error);
+        }
+    } catch (error) {
+        console.error('Error loading models:', error);
+    }
+}
+
+function filterModels() {
+    const filtered = currentFilter === 'all' 
+        ? allModels 
+        : allModels.filter(model => model.model_type === currentFilter);
+    renderModels(filtered);
+}
+
+function renderModels(models) {
+    const grid = document.getElementById('modelGrid');
+    
+    if (models.length === 0) {
+        grid.innerHTML = `
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-robot fa-4x text-muted mb-3"></i>
+                <h4 class="text-muted">No models found</h4>
+                <p class="text-muted">Upload your first AI model to get started</p>
+            </div>
+        `;
+        return;
+    }
+    
+    grid.innerHTML = models.map(model => `
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="model-card bg-dark p-3">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h5 class="text-light mb-1">${model.model_name}</h5>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="model-version">v${model.version}</span>
+                            <span class="model-status status-${model.status}">${model.status}</span>
+                            ${model.is_default ? '<span class="badge bg-warning text-dark">Default</span>' : ''}
+                            ${model.is_custom ? '<span class="badge bg-info">Custom</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                                data-bs-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="#" onclick="viewModelDetails(${model.id})">
+                                <i class="fas fa-eye me-2"></i>View Details
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="toggleModelStatus(${model.id}, ${!model.is_active})">
+                                <i class="fas fa-${model.is_active ? 'pause' : 'play'} me-2"></i>
+                                ${model.is_active ? 'Deactivate' : 'Activate'}
+                            </a></li>
+                            ${!model.is_default ? `
+                            <li><a class="dropdown-item" href="#" onclick="setAsDefault(${model.id})">
+                                <i class="fas fa-star me-2"></i>Set as Default
+                            </a></li>
+                            ` : ''}
+                        </ul>
+                    </div>
+                </div>
+                
+                <p class="text-muted small mb-3">${model.description || 'No description available'}</p>
+                
+                <div class="row">
+                    ${model.accuracy ? `
+                    <div class="col-6">
+                        <div class="metric-badge">
+                            <div class="metric-value">${model.accuracy.toFixed(1)}%</div>
+                            <div class="metric-label">Accuracy</div>
+                        </div>
+                    </div>
+                    ` : ''}
+                    ${model.precision ? `
+                    <div class="col-6">
+                        <div class="metric-badge">
+                            <div class="metric-value">${model.precision.toFixed(1)}%</div>
+                            <div class="metric-label">Precision</div>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-secondary">
+                    <small class="text-muted">
+                        <i class="fas fa-calendar-alt me-1"></i>
+                        ${new Date(model.created_at).toLocaleDateString()}
+                    </small>
+                    <small class="text-muted">
+                        <i class="fas fa-database me-1"></i>
+                        ${model.training_data_size || 'Unknown'} samples
+                    </small>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function uploadModel(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const data = {};
+    
+    // Convert form data to JSON
+    for (let [key, value] of formData.entries()) {
+        if (key === 'features') {
+            data[key] = value.split(',').map(f => f.trim()).filter(f => f);
+        } else if (key === 'is_active') {
+            data[key] = true;
+        } else if (['accuracy', 'precision', 'recall', 'f1_score', 'training_data_size'].includes(key)) {
+            data[key] = value ? parseFloat(value) : null;
+        } else if (!['model_file', 'scaler_file'].includes(key)) {
+            data[key] = value;
+        }
+    }
+    
+    try {
+        // First, create the model entry
+        const response = await fetch('/api/model-gallery/models', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-Key': 'demo-api-key-12345' // Using demo key
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            // Then upload the files
+            const fileFormData = new FormData();
+            fileFormData.append('model_file', formData.get('model_file'));
+            if (formData.get('scaler_file')) {
+                fileFormData.append('scaler_file', formData.get('scaler_file'));
+            }
+            
+            const uploadResponse = await fetch(`/api/model-gallery/models/${result.model.id}/upload`, {
+                method: 'POST',
+                headers: {
+                    'X-API-Key': 'demo-api-key-12345'
+                },
+                body: fileFormData
+            });
+            
+            if (uploadResponse.ok) {
+                alert('Model uploaded successfully!');
+                document.getElementById('uploadModelModal').classList.remove('show');
+                document.querySelector('.modal-backdrop').remove();
+                document.body.classList.remove('modal-open');
+                loadModels();
+            } else {
+                const error = await uploadResponse.json();
+                alert('Error uploading files: ' + error.error);
+            }
+        } else {
+            alert('Error creating model: ' + result.error);
+        }
+    } catch (error) {
+        alert('Error uploading model: ' + error.message);
+    }
+}
+
+async function toggleModelStatus(modelId, activate) {
+    try {
+        const endpoint = activate ? 'activate' : 'deactivate';
+        const response = await fetch(`/api/model-gallery/models/${modelId}/${endpoint}`, {
+            method: 'POST',
+            headers: {
+                'X-API-Key': 'demo-api-key-12345'
+            }
+        });
+        
+        if (response.ok) {
+            loadModels();
+        } else {
+            const error = await response.json();
+            alert('Error: ' + error.error);
+        }
+    } catch (error) {
+        alert('Error updating model: ' + error.message);
+    }
+}
+
+async function setAsDefault(modelId) {
+    try {
+        const response = await fetch(`/api/model-gallery/models/${modelId}/activate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-Key': 'demo-api-key-12345'
+            },
+            body: JSON.stringify({ set_as_default: true })
+        });
+        
+        if (response.ok) {
+            loadModels();
+        } else {
+            const error = await response.json();
+            alert('Error: ' + error.error);
+        }
+    } catch (error) {
+        alert('Error setting default: ' + error.message);
+    }
+}
+
+async function viewModelDetails(modelId) {
+    try {
+        const response = await fetch(`/api/model-gallery/models/${modelId}`);
+        const model = await response.json();
+        
+        if (response.ok) {
+            document.getElementById('modelDetailsTitle').textContent = `${model.model_name} v${model.version}`;
+            document.getElementById('modelDetailsBody').innerHTML = `
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6 class="text-light mb-3">Model Information</h6>
+                        <table class="table table-dark table-striped">
+                            <tr><td>Type</td><td>${model.model_type}</td></tr>
+                            <tr><td>Status</td><td><span class="model-status status-${model.status}">${model.status}</span></td></tr>
+                            <tr><td>Created</td><td>${new Date(model.created_at).toLocaleString()}</td></tr>
+                            <tr><td>Training Data Size</td><td>${model.training_data_size || 'N/A'} samples</td></tr>
+                            <tr><td>Required Features</td><td>${model.features.join(', ') || 'N/A'}</td></tr>
+                        </table>
+                        
+                        <h6 class="text-light mb-3 mt-4">Description</h6>
+                        <p class="text-muted">${model.description || 'No description available'}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="text-light mb-3">Performance Metrics</h6>
+                        ${model.accuracy ? `
+                        <div class="metric-badge mb-3">
+                            <div class="metric-value">${model.accuracy.toFixed(2)}%</div>
+                            <div class="metric-label">Accuracy</div>
+                        </div>
+                        ` : ''}
+                        ${model.precision ? `
+                        <div class="metric-badge mb-3">
+                            <div class="metric-value">${model.precision.toFixed(2)}%</div>
+                            <div class="metric-label">Precision</div>
+                        </div>
+                        ` : ''}
+                        ${model.recall ? `
+                        <div class="metric-badge mb-3">
+                            <div class="metric-value">${model.recall.toFixed(2)}%</div>
+                            <div class="metric-label">Recall</div>
+                        </div>
+                        ` : ''}
+                        ${model.f1_score ? `
+                        <div class="metric-badge mb-3">
+                            <div class="metric-value">${model.f1_score.toFixed(2)}%</div>
+                            <div class="metric-label">F1-Score</div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            new bootstrap.Modal(document.getElementById('modelDetailsModal')).show();
+        }
+    } catch (error) {
+        alert('Error loading model details: ' + error.message);
+    }
+}
+</script>
+{% endblock %}

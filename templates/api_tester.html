@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Tester - AI Prediction Platform</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .result-box {
+            background-color: var(--bs-gray-900);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            min-height: 100px;
+            border: 1px solid var(--bs-gray-700);
+        }
+        .success-result {
+            border-color: var(--bs-success);
+            background-color: rgba(25, 135, 84, 0.1);
+        }
+        .error-result {
+            border-color: var(--bs-danger);
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="fas fa-brain me-2"></i>AI Platform</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+                <a class="nav-link" href="/getting-started"><i class="fas fa-rocket me-2"></i>Get Started</a>
+                <a class="nav-link" href="/api-docs"><i class="fas fa-book me-2"></i>API Docs</a>
+                <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Sign Out</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-4"><i class="fas fa-vial me-3"></i>API Tester</h1>
+                <p class="lead">Test your API keys and prediction models interactively.</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <!-- API Key Selection -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-key me-2"></i>Select API Key</h5>
+                    </div>
+                    <div class="card-body">
+                        <select class="form-select" id="apiKeySelect">
+                            <option value="">Choose an API key...</option>
+                            {% for key in api_keys %}
+                            {% if key.is_active %}
+                            <option value="{{ key.key }}">{{ key.name }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Model Selection -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-robot me-2"></i>Select Model</h5>
+                    </div>
+                    <div class="card-body">
+                        <select class="form-select" id="modelSelect" onchange="loadModelForm()">
+                            <option value="">Choose a model...</option>
+                            <option value="lead-scoring">Lead Scoring</option>
+                            <option value="churn-prediction">Churn Prediction</option>
+                            <option value="sales-forecast">Sales Forecasting</option>
+                            <option value="sentiment-analysis">Sentiment Analysis</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <!-- Test Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-play me-2"></i>Test Your Model</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="modelForm">
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-arrow-left fa-2x mb-3"></i>
+                                <p>Select an API key and model to start testing</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <button class="btn btn-secondary" onclick="clearForm()" disabled id="clearBtn">
+                                <i class="fas fa-eraser me-2"></i>Clear
+                            </button>
+                            <button class="btn btn-primary" onclick="testAPI()" disabled id="testBtn">
+                                <i class="fas fa-paper-plane me-2"></i>Test API
+                            </button>
+                        </div>
+
+                        <!-- Results -->
+                        <div id="results" class="result-box" style="display: none;">
+                            <div id="resultContent"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const forms = {
+            'lead-scoring': `
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Company Size</label>
+                            <select class="form-select" id="company_size">
+                                <option value="Small">Small</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Large">Large</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Industry</label>
+                            <select class="form-select" id="industry">
+                                <option value="Technology">Technology</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Retail">Retail</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Budget ($)</label>
+                            <input type="number" class="form-control" id="budget" value="50000">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Engagement Score (0-100)</label>
+                            <input type="number" class="form-control" id="engagement_score" min="0" max="100" value="75">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Source</label>
+                            <select class="form-select" id="source">
+                                <option value="Website">Website</option>
+                                <option value="Email">Email</option>
+                                <option value="Social Media">Social Media</option>
+                                <option value="Referral">Referral</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `,
+            'churn-prediction': `
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Tenure (months)</label>
+                            <input type="number" class="form-control" id="tenure_months" value="24">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Monthly Charges ($)</label>
+                            <input type="number" class="form-control" id="monthly_charges" value="79.99" step="0.01">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Total Charges ($)</label>
+                            <input type="number" class="form-control" id="total_charges" value="1919.76" step="0.01">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Contract Type</label>
+                            <select class="form-select" id="contract_type">
+                                <option value="Month-to-month">Month-to-month</option>
+                                <option value="One year">One year</option>
+                                <option value="Two year">Two year</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Payment Method</label>
+                            <select class="form-select" id="payment_method">
+                                <option value="Electronic check">Electronic check</option>
+                                <option value="Credit card">Credit card</option>
+                                <option value="Bank transfer">Bank transfer</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Support Tickets</label>
+                            <input type="number" class="form-control" id="support_tickets" value="3">
+                        </div>
+                    </div>
+                </div>
+            `,
+            'sales-forecast': `
+                <div class="mb-3">
+                    <label class="form-label">Historical Sales (comma-separated)</label>
+                    <input type="text" class="form-control" id="historical_sales" value="10000,12000,15000,11000,13000" 
+                           placeholder="e.g., 10000,12000,15000">
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Marketing Spend ($)</label>
+                            <input type="number" class="form-control" id="marketing_spend" value="5000">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Season</label>
+                            <select class="form-select" id="season">
+                                <option value="Q1">Q1</option>
+                                <option value="Q2">Q2</option>
+                                <option value="Q3">Q3</option>
+                                <option value="Q4">Q4</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Product Launches</label>
+                            <input type="number" class="form-control" id="product_launches" value="2">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Market Trends</label>
+                            <select class="form-select" id="market_trends">
+                                <option value="Growing">Growing</option>
+                                <option value="Stable">Stable</option>
+                                <option value="Declining">Declining</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `,
+            'sentiment-analysis': `
+                <div class="mb-3">
+                    <label class="form-label">Text to Analyze</label>
+                    <textarea class="form-control" id="text" rows="4" 
+                              placeholder="Enter the text you want to analyze for sentiment...">I absolutely love this product! It's amazing and works perfectly.</textarea>
+                </div>
+            `
+        };
+
+        function loadModelForm() {
+            const model = document.getElementById('modelSelect').value;
+            const formContainer = document.getElementById('modelForm');
+            const clearBtn = document.getElementById('clearBtn');
+            const testBtn = document.getElementById('testBtn');
+
+            if (model && forms[model]) {
+                formContainer.innerHTML = forms[model];
+                clearBtn.disabled = false;
+                testBtn.disabled = false;
+            } else {
+                formContainer.innerHTML = `
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-arrow-left fa-2x mb-3"></i>
+                        <p>Select an API key and model to start testing</p>
+                    </div>
+                `;
+                clearBtn.disabled = true;
+                testBtn.disabled = true;
+            }
+
+            // Hide results
+            document.getElementById('results').style.display = 'none';
+        }
+
+        function clearForm() {
+            loadModelForm();
+        }
+
+        function collectFormData() {
+            const model = document.getElementById('modelSelect').value;
+            const data = {};
+
+            const formElements = document.querySelectorAll('#modelForm input, #modelForm select, #modelForm textarea');
+            formElements.forEach(element => {
+                if (element.id) {
+                    let value = element.value;
+                    
+                    // Special handling for different field types
+                    if (element.type === 'number') {
+                        value = parseFloat(value);
+                    } else if (element.id === 'historical_sales') {
+                        value = value.split(',').map(x => parseFloat(x.trim())).filter(x => !isNaN(x));
+                    }
+                    
+                    data[element.id] = value;
+                }
+            });
+
+            return data;
+        }
+
+        function testAPI() {
+            const apiKey = document.getElementById('apiKeySelect').value;
+            const model = document.getElementById('modelSelect').value;
+            
+            if (!apiKey) {
+                alert('Please select an API key');
+                return;
+            }
+            
+            if (!model) {
+                alert('Please select a model');
+                return;
+            }
+
+            const data = collectFormData();
+            const testBtn = document.getElementById('testBtn');
+            const originalText = testBtn.innerHTML;
+            
+            // Show loading state
+            testBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Testing...';
+            testBtn.disabled = true;
+
+            fetch(`/api/predict/${model}`, {
+                method: 'POST',
+                headers: {
+                    'X-API-Key': apiKey,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json().then(data => ({status: response.status, data})))
+            .then(result => {
+                const resultsDiv = document.getElementById('results');
+                const resultContent = document.getElementById('resultContent');
+                
+                resultsDiv.style.display = 'block';
+                
+                if (result.status === 200) {
+                    resultsDiv.className = 'result-box success-result';
+                    resultContent.innerHTML = \`
+                        <h6 class="text-success"><i class="fas fa-check-circle me-2"></i>Success!</h6>
+                        <pre class="mb-0"><code>\${JSON.stringify(result.data, null, 2)}</code></pre>
+                    \`;
+                } else {
+                    resultsDiv.className = 'result-box error-result';
+                    resultContent.innerHTML = \`
+                        <h6 class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Error (Status: \${result.status})</h6>
+                        <pre class="mb-0"><code>\${JSON.stringify(result.data, null, 2)}</code></pre>
+                    \`;
+                }
+            })
+            .catch(error => {
+                const resultsDiv = document.getElementById('results');
+                const resultContent = document.getElementById('resultContent');
+                
+                resultsDiv.style.display = 'block';
+                resultsDiv.className = 'result-box error-result';
+                resultContent.innerHTML = \`
+                    <h6 class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Network Error</h6>
+                    <p>Failed to connect to the API. Please check your connection and try again.</p>
+                    <pre class="mb-0"><code>\${error.message}</code></pre>
+                \`;
+            })
+            .finally(() => {
+                // Reset button
+                testBtn.innerHTML = originalText;
+                testBtn.disabled = false;
+            });
+        }
+
+        // Enable/disable test button based on selections
+        document.getElementById('apiKeySelect').addEventListener('change', function() {
+            const testBtn = document.getElementById('testBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const hasKey = this.value !== '';
+            const hasModel = document.getElementById('modelSelect').value !== '';
+            
+            testBtn.disabled = !(hasKey && hasModel);
+            clearBtn.disabled = !hasModel;
+        });
+    </script>
+</body>
+</html>

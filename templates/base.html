@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Prediction Platform{% endblock %}</title>
+    
+    <!-- Bootstrap CSS with Replit Dark Theme -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/dashboard.css') }}" rel="stylesheet">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-brain me-2"></i>
+                AI Prediction Platform
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-tachometer-alt me-1"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/data-guide">
+                            <i class="fas fa-database me-1"></i>
+                            Data Guide
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/models">
+                            <i class="fas fa-robot me-1"></i>
+                            Model Gallery
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-robot me-1"></i>
+                            ML Models
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><h6 class="dropdown-header">Quick Testing</h6></li>
+                            <li><a class="dropdown-item" href="/ml-services/lead-scoring">
+                                <i class="fas fa-user-tie me-1"></i>Lead Scoring <small class="text-success">(v1.0.0)</small></a></li>
+                            <li><a class="dropdown-item" href="/ml-services/churn-prediction">
+                                <i class="fas fa-user-times me-1"></i>Churn Prediction <small class="text-success">(v1.0.0)</small></a></li>
+                            <li><a class="dropdown-item" href="/ml-services/sales-forecast">
+                                <i class="fas fa-chart-line me-1"></i>Sales Forecast <small class="text-success">(v1.0.0)</small></a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Text Analysis</h6></li>
+                            <li><a class="dropdown-item" href="#" data-model="sentiment">
+                                <i class="fas fa-comment-dots me-1"></i>Sentiment Analysis</a></li>
+                            <li><a class="dropdown-item" href="#" data-model="keywords">
+                                <i class="fas fa-tags me-1"></i>Keyword Extraction</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/models">
+                                <i class="fas fa-cog me-1"></i>Manage Models</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-plug me-1"></i>
+                            Connectors
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" id="hubspotConnector">
+                                <i class="fas fa-hubspot me-1"></i>HubSpot</a></li>
+                            <li><a class="dropdown-item" href="#" id="zohoConnector">
+                                <i class="fas fa-database me-1"></i>Zoho CRM</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-cog me-1"></i>
+                            Settings
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#apiKeyModal">
+                                <i class="fas fa-key me-1"></i>API Keys</a></li>
+                            <li><a class="dropdown-item" href="#" id="viewLogs">
+                                <i class="fas fa-list me-1"></i>Prediction Logs</a></li>
+                            <li><a class="dropdown-item" href="#" id="viewUploads">
+                                <i class="fas fa-upload me-1"></i>File Uploads</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- API Key Modal -->
+    <div class="modal fade" id="apiKeyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-key me-2"></i>
+                        API Key Management
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Default API Key</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="defaultApiKey" value="demo-api-key-12345" readonly>
+                            <button class="btn btn-outline-secondary" type="button" id="copyApiKey">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">Use this key in the X-API-Key header for API requests</div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Authentication:</strong> Include the API key in your request headers as <code>X-API-Key</code>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Alert Container -->
+    <div id="alertContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 9999; top: 80px !important;"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

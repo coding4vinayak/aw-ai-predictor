@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Platform Monitoring - Real-time Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-card {
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+        }
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        .metric-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .status-healthy { color: #28a745; }
+        .status-warning { color: #ffc107; }
+        .status-critical { color: #dc3545; }
+        .alert-item {
+            border-left: 4px solid;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+        }
+        .alert-high { border-left-color: #dc3545; }
+        .alert-medium { border-left-color: #ffc107; }
+        .alert-low { border-left-color: #17a2b8; }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .model-health-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: #e9ecef;
+            overflow: hidden;
+        }
+        .model-health-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        .health-excellent { background: #28a745; }
+        .health-good { background: #20c997; }
+        .health-warning { background: #ffc107; }
+        .health-critical { background: #dc3545; }
+        .refresh-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/"><i class="fas fa-chart-line me-2"></i>AI Platform Monitoring</a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">
+                    <i class="fas fa-circle text-success" id="connectionStatus"></i>
+                    <span id="connectionText">Connected</span>
+                </span>
+                <a class="nav-link" href="/"><i class="fas fa-home"></i> Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- System Overview -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center">
+                        <div class="metric-value text-primary" id="totalPredictions">-</div>
+                        <div class="metric-label">Total Predictions</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center">
+                        <div class="metric-value text-success" id="activeModels">-</div>
+                        <div class="metric-label">Active Models</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center">
+                        <div class="metric-value text-info" id="avgResponseTime">-</div>
+                        <div class="metric-label">Avg Response Time (ms)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center">
+                        <div class="metric-value text-success" id="systemUptime">-</div>
+                        <div class="metric-label">System Uptime</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Model Performance -->
+            <div class="col-md-8">
+                <div class="card dashboard-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-brain me-2"></i>Model Performance</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="modelsContainer" class="row">
+                            <!-- Models will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Charts -->
+                <div class="card dashboard-card mt-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-area me-2"></i>Performance Trends</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts & Metrics -->
+            <div class="col-md-4">
+                <!-- Alerts -->
+                <div class="card dashboard-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-exclamation-triangle me-2"></i>Active Alerts</h5>
+                        <span class="badge bg-danger" id="alertCount">0</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="alertsContainer">
+                            <div class="text-muted text-center">No active alerts</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Metrics -->
+                <div class="card dashboard-card mt-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-server me-2"></i>System Metrics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="systemMetrics">
+                            <!-- System metrics will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Health -->
+                <div class="card dashboard-card mt-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-network-wired me-2"></i>API Health</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="apiHealthChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Refresh Indicator -->
+    <div class="refresh-indicator">
+        <div class="spinner-border text-primary" role="status" id="refreshSpinner" style="display: none;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        class MonitoringDashboard {
+            constructor() {
+                this.refreshInterval = 5000; // 5 seconds
+                this.charts = {};
+                this.init();
+            }
+
+            init() {
+                this.initCharts();
+                this.startDataRefresh();
+                this.loadInitialData();
+            }
+
+            initCharts() {
+                // Performance Chart
+                const perfCtx = document.getElementById('performanceChart').getContext('2d');
+                this.charts.performance = new Chart(perfCtx, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Response Time (ms)',
+                            data: [],
+                            borderColor: '#007bff',
+                            tension: 0.1
+                        }, {
+                            label: 'Confidence Score',
+                            data: [],
+                            borderColor: '#28a745',
+                            tension: 0.1,
+                            yAxisID: 'y1'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                grid: {
+                                    drawOnChartArea: false,
+                                },
+                            }
+                        }
+                    }
+                });
+
+                // API Health Chart
+                const apiCtx = document.getElementById('apiHealthChart').getContext('2d');
+                this.charts.apiHealth = new Chart(apiCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Success', 'Errors'],
+                        datasets: [{
+                            data: [95, 5],
+                            backgroundColor: ['#28a745', '#dc3545']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+
+            async loadInitialData() {
+                await Promise.all([
+                    this.updateUsageStats(),
+                    this.updateModels(),
+                    this.updateAlerts(),
+                    this.updateSystemMetrics()
+                ]);
+            }
+
+            startDataRefresh() {
+                setInterval(() => {
+                    this.refreshData();
+                }, this.refreshInterval);
+            }
+
+            async refreshData() {
+                const spinner = document.getElementById('refreshSpinner');
+                spinner.style.display = 'block';
+
+                try {
+                    await this.loadInitialData();
+                    this.updateConnectionStatus(true);
+                } catch (error) {
+                    console.error('Failed to refresh data:', error);
+                    this.updateConnectionStatus(false);
+                } finally {
+                    spinner.style.display = 'none';
+                }
+            }
+
+            updateConnectionStatus(connected) {
+                const statusIcon = document.getElementById('connectionStatus');
+                const statusText = document.getElementById('connectionText');
+                
+                if (connected) {
+                    statusIcon.className = 'fas fa-circle text-success';
+                    statusText.textContent = 'Connected';
+                } else {
+                    statusIcon.className = 'fas fa-circle text-danger';
+                    statusText.textContent = 'Disconnected';
+                }
+            }
+
+            async updateUsageStats() {
+                try {
+                    const response = await fetch('/monitoring/api/usage-stats');
+                    const data = await response.json();
+                    
+                    document.getElementById('totalPredictions').textContent = data.total_predictions.toLocaleString();
+                    document.getElementById('activeModels').textContent = data.active_models;
+                    document.getElementById('avgResponseTime').textContent = (data.avg_response_time * 1000).toFixed(0);
+                    document.getElementById('systemUptime').textContent = data.system_uptime;
+                } catch (error) {
+                    console.error('Failed to update usage stats:', error);
+                }
+            }
+
+            async updateModels() {
+                try {
+                    const response = await fetch('/monitoring/api/models');
+                    const data = await response.json();
+                    
+                    const container = document.getElementById('modelsContainer');
+                    container.innerHTML = '';
+                    
+                    Object.entries(data.models).forEach(([modelName, modelData]) => {
+                        const modelCard = this.createModelCard(modelName, modelData);
+                        container.appendChild(modelCard);
+                    });
+                } catch (error) {
+                    console.error('Failed to update models:', error);
+                }
+            }
+
+            createModelCard(name, data) {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 mb-3';
+                
+                const healthClass = data.health_score >= 80 ? 'health-excellent' : 
+                                  data.health_score >= 60 ? 'health-good' : 
+                                  data.health_score >= 40 ? 'health-warning' : 'health-critical';
+                
+                const statusClass = data.status === 'healthy' ? 'status-healthy' : 
+                                  data.status === 'warning' ? 'status-warning' : 'status-critical';
+                
+                col.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                ${name}
+                                <span class="badge bg-secondary ms-2">${data.status}</span>
+                            </h6>
+                            <div class="model-health-bar mb-2">
+                                <div class="model-health-fill ${healthClass}" style="width: ${data.health_score}%"></div>
+                            </div>
+                            <div class="small text-muted">
+                                <div>Health Score: <strong>${data.health_score}%</strong></div>
+                                <div>Predictions: <strong>${data.predictions_count}</strong></div>
+                                <div>Avg Confidence: <strong>${(data.avg_confidence * 100).toFixed(1)}%</strong></div>
+                                <div>Response Time: <strong>${(data.avg_processing_time * 1000).toFixed(0)}ms</strong></div>
+                                <div>Error Rate: <strong>${data.error_rate}%</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                return col;
+            }
+
+            async updateAlerts() {
+                try {
+                    const response = await fetch('/monitoring/api/alerts');
+                    const data = await response.json();
+                    
+                    document.getElementById('alertCount').textContent = data.count;
+                    
+                    const container = document.getElementById('alertsContainer');
+                    
+                    if (data.alerts.length === 0) {
+                        container.innerHTML = '<div class="text-muted text-center">No active alerts</div>';
+                    } else {
+                        container.innerHTML = data.alerts.map(alert => `
+                            <div class="alert-item alert-${alert.severity}">
+                                <div class="fw-bold">${alert.severity.toUpperCase()}</div>
+                                <div>${alert.message}</div>
+                                <div class="small text-muted">${new Date(alert.timestamp).toLocaleString()}</div>
+                            </div>
+                        `).join('');
+                    }
+                } catch (error) {
+                    console.error('Failed to update alerts:', error);
+                }
+            }
+
+            async updateSystemMetrics() {
+                try {
+                    const response = await fetch('/monitoring/api/metrics');
+                    const data = await response.json();
+                    
+                    const container = document.getElementById('systemMetrics');
+                    container.innerHTML = '';
+                    
+                    // Display key system metrics
+                    const metrics = [
+                        { name: 'CPU Usage', value: '45%', icon: 'fas fa-microchip' },
+                        { name: 'Memory Usage', value: '67%', icon: 'fas fa-memory' },
+                        { name: 'Active Connections', value: Object.keys(data.gauges).length, icon: 'fas fa-plug' },
+                        { name: 'Requests/min', value: '1.2K', icon: 'fas fa-exchange-alt' }
+                    ];
+                    
+                    metrics.forEach(metric => {
+                        const metricEl = document.createElement('div');
+                        metricEl.className = 'd-flex justify-content-between align-items-center mb-2';
+                        metricEl.innerHTML = `
+                            <div>
+                                <i class="${metric.icon} me-2"></i>
+                                ${metric.name}
+                            </div>
+                            <strong>${metric.value}</strong>
+                        `;
+                        container.appendChild(metricEl);
+                    });
+                } catch (error) {
+                    console.error('Failed to update system metrics:', error);
+                }
+            }
+        }
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new MonitoringDashboard();
+        });
+    </script>
+</body>
+</html>

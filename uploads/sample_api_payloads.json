@@ -1,0 +1,30 @@
+{
+  "lead_scoring": {
+    "company_size": "51-200",
+    "budget": 150000,
+    "industry_score": 8.5,
+    "engagement_score": 7.2,
+    "demographic_score": 6.8,
+    "behavioral_score": 8.1,
+    "source_score": 7.5
+  },
+  "churn_prediction": {
+    "tenure": 24,
+    "monthly_charges": 85.5,
+    "total_charges": 2052.0,
+    "contract_type": "One year",
+    "payment_method": "Credit card",
+    "internet_service": "Fiber optic",
+    "support_tickets": 2
+  },
+  "sales_forecast": {
+    "historical_sales": 125000,
+    "seasonality": 1.2,
+    "marketing_spend": 25000,
+    "economic_indicators": 1.05,
+    "product_category": "Electronics"
+  },
+  "nlp_analysis": {
+    "text": "This is an excellent product with outstanding customer service. I'm very satisfied with my purchase and would definitely recommend it to others."
+  }
+}

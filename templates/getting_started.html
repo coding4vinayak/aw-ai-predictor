@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started - AI Prediction Platform</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--bs-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        .code-block {
+            background-color: var(--bs-gray-900);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid var(--bs-gray-700);
+        }
+        .highlight-box {
+            background-color: var(--bs-info);
+            background-opacity: 0.1;
+            border-left: 4px solid var(--bs-info);
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="fas fa-brain me-2"></i>AI Platform</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+                <a class="nav-link" href="/api-docs"><i class="fas fa-book me-2"></i>API Docs</a>
+                <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Sign Out</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-4"><i class="fas fa-rocket me-3"></i>Getting Started Guide</h1>
+                <p class="lead">Learn how to use the AI Prediction Platform API in just a few simple steps.</p>
+            </div>
+        </div>
+
+        <!-- Step 1: Get Your API Key -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="step-number">1</div>
+                            <div class="flex-grow-1">
+                                <h3>Get Your API Key</h3>
+                                <p>Your API key is automatically created when you register. You can find it and manage additional keys on your dashboard.</p>
+                                
+                                <div class="highlight-box">
+                                    <i class="fas fa-lightbulb me-2"></i>
+                                    <strong>Tip:</strong> Click the copy button next to your API key to copy it to clipboard. If copying fails, a modal will show the full key for manual copying.
+                                </div>
+
+                                <h5>Finding Your API Key:</h5>
+                                <ol>
+                                    <li>Go to your <a href="/" class="text-decoration-none">Dashboard</a></li>
+                                    <li>Look for the "Your API Keys" section</li>
+                                    <li>Click the copy button next to any active key</li>
+                                    <li>The key will be copied to your clipboard</li>
+                                </ol>
+
+                                <div class="code-block">
+                                    <strong>Your API key format:</strong><br>
+                                    <code>xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Choose Your Prediction Model -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="step-number">2</div>
+                            <div class="flex-grow-1">
+                                <h3>Choose Your Prediction Model</h3>
+                                <p>We offer 5 different AI prediction services:</p>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <h6><i class="fas fa-star text-warning me-2"></i>Lead Scoring</h6>
+                                                <p class="small mb-2">Predict lead quality and conversion probability</p>
+                                                <code>/api/predict/lead-scoring</code>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <h6><i class="fas fa-user-times text-danger me-2"></i>Churn Prediction</h6>
+                                                <p class="small mb-2">Predict customer churn risk</p>
+                                                <code>/api/predict/churn-prediction</code>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <h6><i class="fas fa-chart-line text-success me-2"></i>Sales Forecasting</h6>
+                                                <p class="small mb-2">Predict future sales revenue</p>
+                                                <code>/api/predict/sales-forecast</code>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <h6><i class="fas fa-comment-alt text-info me-2"></i>Sentiment Analysis</h6>
+                                                <p class="small mb-2">Analyze text sentiment and emotions</p>
+                                                <code>/api/predict/sentiment-analysis</code>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Make Your First API Call -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="step-number">3</div>
+                            <div class="flex-grow-1">
+                                <h3>Make Your First API Call</h3>
+                                <p>Here's a complete example using Python to predict lead scoring:</p>
+                                
+                                <div class="code-block">
+<pre><code>import requests
+import json
+
+# Your API configuration
+API_KEY = "your-api-key-here"  # Replace with your actual API key
+BASE_URL = "{{ request.url_root.rstrip('/') }}"
+
+# Set up headers
+headers = {
+    "X-API-Key": API_KEY,
+    "Content-Type": "application/json"
+}
+
+# Example data for lead scoring
+data = {
+    "company_size": "Medium",
+    "industry": "Technology",
+    "budget": 50000,
+    "engagement_score": 75,
+    "source": "Website"
+}
+
+# Make the API call
+response = requests.post(
+    f"{BASE_URL}/api/predict/lead-scoring",
+    headers=headers,
+    json=data
+)
+
+# Check the response
+if response.status_code == 200:
+    result = response.json()
+    print("✅ Success!")
+    print(f"Prediction: {result['prediction']}")
+    print(f"Confidence: {result['confidence']:.2%}")
+    print(f"Score: {result['score']}")
+else:
+    print("❌ Error:")
+    print(f"Status Code: {response.status_code}")
+    print(f"Response: {response.text}")
+</code></pre>
+                                </div>
+
+                                <h5>Expected Response:</h5>
+                                <div class="code-block">
+<pre><code>{
+    "prediction": "High Quality",
+    "confidence": 0.87,
+    "score": 85.3,
+    "model_version": "1.0",
+    "timestamp": "2025-01-15T10:30:00Z"
+}
+</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Handle Responses -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="step-number">4</div>
+                            <div class="flex-grow-1">
+                                <h3>Handle API Responses</h3>
+                                <p>All API responses follow a consistent format. Here's how to handle them:</p>
+                                
+                                <h5>Success Response (200):</h5>
+                                <div class="code-block">
+<pre><code>{
+    "prediction": "High Quality",           // The main prediction result
+    "confidence": 0.87,                    // Confidence score (0-1)
+    "score": 85.3,                         // Numerical score (varies by model)
+    "model_version": "1.0",                // Model version used
+    "timestamp": "2025-01-15T10:30:00Z"    // When prediction was made
+}
+</code></pre>
+                                </div>
+
+                                <h5>Error Response (401, 400, 500):</h5>
+                                <div class="code-block">
+<pre><code>{
+    "error": "Invalid API key",
+    "message": "The provided API key is not valid or has been deactivated"
+}
+</code></pre>
+                                </div>
+
+                                <div class="highlight-box">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Common Error Codes:</strong>
+                                    <ul class="mb-0 mt-2">
+                                        <li><strong>401:</strong> Invalid or missing API key</li>
+                                        <li><strong>400:</strong> Invalid request data or missing required fields</li>
+                                        <li><strong>500:</strong> Internal server error (contact support)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Batch Processing -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="step-number">5</div>
+                            <div class="flex-grow-1">
+                                <h3>Process Multiple Records (Batch Upload)</h3>
+                                <p>For processing many records at once, use our batch upload feature:</p>
+                                
+                                <h5>Prepare Your CSV File:</h5>
+                                <div class="code-block">
+<pre><code># Example CSV for lead scoring (lead_data.csv)
+company_size,industry,budget,engagement_score,source
+Small,Healthcare,25000,60,Email
+Medium,Technology,75000,85,Website  
+Large,Finance,150000,90,Referral
+Small,Retail,10000,45,Social Media
+</code></pre>
+                                </div>
+
+                                <h5>Upload with Python:</h5>
+                                <div class="code-block">
+<pre><code>import requests
+
+API_KEY = "your-api-key-here"
+BASE_URL = "{{ request.url_root.rstrip('/') }}"
+
+# Upload file for batch processing
+with open('lead_data.csv', 'rb') as file:
+    files = {'file': file}
+    data = {'prediction_type': 'lead-scoring'}
+    headers = {'X-API-Key': API_KEY}
+    
+    response = requests.post(
+        f"{BASE_URL}/api/upload-batch",
+        headers=headers,
+        files=files,
+        data=data
+    )
+
+if response.status_code == 200:
+    result = response.json()
+    print(f"✅ Uploaded! Processing {result['predictions_count']} records")
+    print(f"Download results from: {result['download_url']}")
+else:
+    print(f"❌ Upload failed: {response.text}")
+</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 6: Best Practices -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="step-number">6</div>
+                            <div class="flex-grow-1">
+                                <h3>Best Practices & Tips</h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5><i class="fas fa-shield-alt text-success me-2"></i>Security</h5>
+                                        <ul>
+                                            <li>Keep your API keys secure and private</li>
+                                            <li>Use environment variables for API keys</li>
+                                            <li>Rotate keys regularly from the dashboard</li>
+                                            <li>Deactivate unused keys immediately</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <h5><i class="fas fa-tachometer-alt text-info me-2"></i>Performance</h5>
+                                        <ul>
+                                            <li>Use batch upload for multiple records</li>
+                                            <li>Implement proper error handling</li>
+                                            <li>Cache results when appropriate</li>
+                                            <li>Monitor your API usage</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="highlight-box mt-3">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Rate Limits:</strong> Each API key has a rate limit of 1000 requests per hour. Contact support if you need higher limits.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Reference -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-bookmark me-2"></i>Quick Reference</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Endpoints:</h5>
+                                <ul class="list-unstyled">
+                                    <li><code>POST /api/predict/lead-scoring</code></li>
+                                    <li><code>POST /api/predict/churn-prediction</code></li>
+                                    <li><code>POST /api/predict/sales-forecast</code></li>
+                                    <li><code>POST /api/predict/sentiment-analysis</code></li>
+                                    <li><code>POST /api/upload-batch</code></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Required Headers:</h5>
+                                <ul class="list-unstyled">
+                                    <li><code>X-API-Key: your-api-key</code></li>
+                                    <li><code>Content-Type: application/json</code></li>
+                                </ul>
+                                
+                                <h5 class="mt-3">Support:</h5>
+                                <p>For help, check the <a href="/api-docs">full API documentation</a> or contact support.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

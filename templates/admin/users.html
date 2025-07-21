@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block title %}User Management - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h2">
+                <i class="fas fa-users me-2"></i>User Management
+            </h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/admin">Admin</a></li>
+                    <li class="breadcrumb-item active">Users</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <!-- User Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-primary">{{ users.total }}</h3>
+                    <small class="text-muted">Total Users</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-success">Active</h3>
+                    <small class="text-muted">Status Filter</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" class="form-control" placeholder="Search users..." id="searchUsers">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" id="planFilter">
+                                <option value="">All Plans</option>
+                                <option value="Free">Free</option>
+                                <option value="Basic">Basic</option>
+                                <option value="Premium">Premium</option>
+                                <option value="Enterprise">Enterprise</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- User Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">All Users</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Plan</th>
+                                    <th>Credits</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users.items %}
+                                <tr id="user-row-{{ user.id }}">
+                                    <td>{{ user.id }}</td>
+                                    <td>
+                                        <strong>{{ user.username }}</strong>
+                                        {% if user.username == 'admin' %}
+                                        <span class="badge bg-warning ms-1">Admin</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if user.is_active else 'secondary' }}">
+                                            {{ 'Active' if user.is_active else 'Inactive' }}
+                                        </span>
+                                    </td>
+                                    <td>{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else 'N/A' }}</td>
+                                    <td>
+                                        <span class="badge bg-info" id="plan-badge-{{ user.id }}">Loading...</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted small" id="credits-info-{{ user.id }}">Loading...</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="/admin/users/{{ user.id }}" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button class="btn btn-outline-success btn-sm" 
+                                                    onclick="openCreditModal({{ user.id }}, '{{ user.username }}')"
+                                                    data-bs-toggle="modal" data-bs-target="#creditModal">
+                                                <i class="fas fa-coins"></i>
+                                            </button>
+                                            {% if user.username != 'admin' %}
+                                            <button class="btn btn-outline-danger btn-sm" 
+                                                    onclick="toggleUserStatus({{ user.id }})">
+                                                <i class="fas fa-{{ 'ban' if user.is_active else 'check' }}"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if users.pages > 1 %}
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            {% if users.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('admin.manage_users', page=users.prev_num) }}">Previous</a>
+                            </li>
+                            {% endif %}
+                            
+                            {% for page_num in users.iter_pages() %}
+                                {% if page_num %}
+                                    {% if page_num != users.page %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('admin.manage_users', page=page_num) }}">{{ page_num }}</a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ page_num }}</span>
+                                    </li>
+                                    {% endif %}
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if users.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('admin.manage_users', page=users.next_num) }}">Next</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Credit Management Modal -->
+<div class="modal fade" id="creditModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Manage Credits</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="creditForm">
+                    <input type="hidden" id="modal-user-id">
+                    <div class="mb-3">
+                        <label class="form-label">User</label>
+                        <input type="text" class="form-control" id="modal-username" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Action</label>
+                        <select class="form-select" id="credit-action">
+                            <option value="add">Add Credits</option>
+                            <option value="set">Set Credits</option>
+                            <option value="upgrade_plan">Upgrade Plan</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="amount-field">
+                        <label class="form-label">Amount</label>
+                        <input type="number" class="form-control" id="credit-amount" min="0">
+                    </div>
+                    <div class="mb-3 d-none" id="plan-field">
+                        <label class="form-label">New Plan</label>
+                        <select class="form-select" id="new-plan">
+                            <option value="Free">Free (100 credits)</option>
+                            <option value="Basic">Basic (500 credits)</option>
+                            <option value="Premium">Premium (2000 credits)</option>
+                            <option value="Enterprise">Enterprise (10000 credits)</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="updateUserCredits()">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Load user credit info
+document.addEventListener('DOMContentLoaded', function() {
+    loadAllUserCredits();
+});
+
+function loadAllUserCredits() {
+    const rows = document.querySelectorAll('[id^="user-row-"]');
+    rows.forEach(row => {
+        const userId = row.id.split('-')[2];
+        loadUserCreditInfo(userId);
+    });
+}
+
+function loadUserCreditInfo(userId) {
+    // Mock data for now - in a real system this would be an API call
+    const plans = ['Free', 'Basic', 'Premium'];
+    const plan = plans[Math.floor(Math.random() * plans.length)];
+    const credits = Math.floor(Math.random() * 500);
+    
+    document.getElementById(`plan-badge-${userId}`).textContent = plan;
+    document.getElementById(`credits-info-${userId}`).textContent = `${credits} remaining`;
+}
+
+function openCreditModal(userId, username) {
+    document.getElementById('modal-user-id').value = userId;
+    document.getElementById('modal-username').value = username;
+    document.getElementById('credit-action').value = 'add';
+    document.getElementById('credit-amount').value = '';
+    toggleCreditFields();
+}
+
+function toggleCreditFields() {
+    const action = document.getElementById('credit-action').value;
+    const amountField = document.getElementById('amount-field');
+    const planField = document.getElementById('plan-field');
+    
+    if (action === 'upgrade_plan') {
+        amountField.classList.add('d-none');
+        planField.classList.remove('d-none');
+    } else {
+        amountField.classList.remove('d-none');
+        planField.classList.add('d-none');
+    }
+}
+
+function updateUserCredits() {
+    const userId = document.getElementById('modal-user-id').value;
+    const action = document.getElementById('credit-action').value;
+    const amount = document.getElementById('credit-amount').value;
+    const planName = document.getElementById('new-plan').value;
+    
+    const data = {
+        user_id: parseInt(userId),
+        action: action
+    };
+    
+    if (action === 'upgrade_plan') {
+        data.plan_name = planName;
+    } else {
+        data.amount = parseInt(amount);
+    }
+    
+    fetch('/admin/api/users/credits', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            alert('Credits updated successfully!');
+            loadUserCreditInfo(userId);
+            bootstrap.Modal.getInstance(document.getElementById('creditModal')).hide();
+        } else {
+            alert('Error updating credits: ' + (result.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating credits');
+    });
+}
+
+function toggleUserStatus(userId) {
+    if (confirm('Are you sure you want to toggle this user\'s status?')) {
+        // Mock toggle for now
+        alert('User status toggled (feature not implemented in demo)');
+    }
+}
+
+// Event listeners
+document.getElementById('credit-action').addEventListener('change', toggleCreditFields);
+</script>
+{% endblock %}

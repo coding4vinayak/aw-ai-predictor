@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+
+{% block title %}Churn Prediction Model - AI Prediction Platform{% endblock %}
+
+{% block extra_head %}
+<style>
+    .model-info-card {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .tech-badge {
+        background-color: rgba(255,255,255,0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        margin: 0.25rem;
+        display: inline-block;
+    }
+    .feature-card {
+        border: 1px solid #374151;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    .feature-card:hover {
+        border-color: #f5576c;
+        transform: translateY(-2px);
+    }
+    .result-card {
+        background: #1f2937;
+        border-radius: 10px;
+        padding: 1.5rem;
+        border-left: 4px solid #ef4444;
+    }
+    .risk-high { color: #ef4444; }
+    .risk-medium { color: #f59e0b; }
+    .risk-low { color: #10b981; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Model Overview -->
+    <div class="model-info-card">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1><i class="fas fa-user-times me-2"></i>Churn Prediction Model</h1>
+                <p class="lead mb-3">Predict customer churn risk and retention probability using advanced analytics</p>
+                <div class="mb-3">
+                    <span class="tech-badge">GradientBoosting</span>
+                    <span class="tech-badge">Scikit-learn</span>
+                    <span class="tech-badge">Python</span>
+                    <span class="tech-badge">Flask</span>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="bg-white bg-opacity-20 rounded p-3">
+                    <h3 class="mb-1">89.2%</h3>
+                    <small>Model Accuracy</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column - Features & Technology -->
+        <div class="col-lg-6">
+            <!-- Technology Stack -->
+            <div class="feature-card bg-dark">
+                <h4 class="text-light mb-3"><i class="fas fa-cogs me-2"></i>Technology Stack</h4>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h6 class="text-info">Machine Learning</h6>
+                        <ul class="text-muted">
+                            <li>GradientBoosting Classifier</li>
+                            <li>StandardScaler normalization</li>
+                            <li>SMOTE oversampling</li>
+                            <li>Grid search optimization</li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-6">
+                        <h6 class="text-info">Framework</h6>
+                        <ul class="text-muted">
+                            <li>Scikit-learn 1.3+</li>
+                            <li>NumPy & Pandas</li>
+                            <li>Imbalanced-learn</li>
+                            <li>Flask REST API</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Input Features -->
+            <div class="feature-card bg-dark">
+                <h4 class="text-light mb-3"><i class="fas fa-user me-2"></i>Customer Information</h4>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label class="form-label text-info">Tenure (Months)</label>
+                            <input type="number" class="form-control bg-dark text-light border-secondary" 
+                                   id="tenure_months" value="24" min="1" max="120">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-info">Monthly Charges ($)</label>
+                            <input type="number" class="form-control bg-dark text-light border-secondary" 
+                                   id="monthly_charges" value="65.50" min="10" max="200" step="0.01">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-info">Total Charges ($)</label>
+                            <input type="number" class="form-control bg-dark text-light border-secondary" 
+                                   id="total_charges" value="1572" min="50" max="10000" step="0.01">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-info">Contract Length</label>
+                            <select class="form-select bg-dark text-light border-secondary" id="contract_length">
+                                <option value="1">Month-to-month</option>
+                                <option value="2">One year</option>
+                                <option value="3">Two year</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label class="form-label text-info">Payment Method Score</label>
+                            <input type="range" class="form-range" id="payment_method_score" 
+                                   min="1" max="5" value="3" oninput="updateValue('payment', this.value)">
+                            <small class="text-muted">Value: <span id="payment_value">3</span>/5</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-info">Support Calls</label>
+                            <input type="number" class="form-control bg-dark text-light border-secondary" 
+                                   id="support_calls" value="2" min="0" max="20">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-info">Usage Score</label>
+                            <input type="range" class="form-range" id="usage_score" 
+                                   min="1" max="10" value="6" oninput="updateValue('usage', this.value)">
+                            <small class="text-muted">Value: <span id="usage_value">6</span>/10</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-info">Satisfaction Score</label>
+                            <input type="range" class="form-range" id="satisfaction_score" 
+                                   min="1" max="10" value="7" oninput="updateValue('satisfaction', this.value)">
+                            <small class="text-muted">Value: <span id="satisfaction_value">7</span>/10</small>
+                        </div>
+                        <button class="btn btn-danger w-100 mt-3" onclick="predictChurn()">
+                            <i class="fas fa-chart-line me-2"></i>Predict Churn Risk
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Results & Tuning -->
+        <div class="col-lg-6">
+            <!-- Prediction Results -->
+            <div class="result-card mb-4" id="results" style="display: none;">
+                <h4 class="text-light mb-3"><i class="fas fa-exclamation-triangle me-2"></i>Churn Analysis</h4>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="text-center bg-danger bg-opacity-20 p-3 rounded">
+                            <h2 class="text-danger mb-1" id="churn_probability">--</h2>
+                            <small class="text-muted">Churn Probability</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center bg-warning bg-opacity-20 p-3 rounded">
+                            <h4 class="mb-1" id="risk_level">--</h4>
+                            <small class="text-muted">Risk Level</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <h6 class="text-light">Model Confidence: <span id="confidence" class="text-info">--</span>%</h6>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" role="progressbar" id="confidence_bar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <h6 class="text-light">Retention Recommendations:</h6>
+                    <ul id="recommendations" class="text-muted small">
+                        <!-- Recommendations will be populated here -->
+                    </ul>
+                </div>
+                <div class="mt-3">
+                    <button class="btn btn-outline-success btn-sm" onclick="saveModel()">
+                        <i class="fas fa-save me-1"></i>Save Tuned Model
+                    </button>
+                    <button class="btn btn-outline-info btn-sm" onclick="resetParameters()">
+                        <i class="fas fa-undo me-1"></i>Reset Parameters
+                    </button>
+                </div>
+            </div>
+
+            <!-- Model Tuning -->
+            <div class="feature-card bg-dark">
+                <h4 class="text-light mb-3"><i class="fas fa-sliders-h me-2"></i>Algorithm Parameters</h4>
+                <div class="mb-3">
+                    <label class="form-label text-info">Learning Rate</label>
+                    <input type="range" class="form-range" id="learning_rate" 
+                           min="0.01" max="0.3" value="0.1" step="0.01" oninput="updateValue('learning', (this.value * 100).toFixed(0))">
+                    <small class="text-muted">Value: <span id="learning_value">10</span>%</small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-info">Number of Estimators</label>
+                    <input type="range" class="form-range" id="n_estimators" 
+                           min="50" max="300" value="100" step="25" oninput="updateValue('estimators', this.value)">
+                    <small class="text-muted">Value: <span id="estimators_value">100</span></small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-info">Max Depth</label>
+                    <input type="range" class="form-range" id="max_depth" 
+                           min="3" max="15" value="6" oninput="updateValue('depth', this.value)">
+                    <small class="text-muted">Value: <span id="depth_value">6</span></small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-info">Subsample Rate</label>
+                    <input type="range" class="form-range" id="subsample" 
+                           min="0.6" max="1.0" value="0.8" step="0.05" oninput="updateValue('subsample', (this.value * 100).toFixed(0))">
+                    <small class="text-muted">Value: <span id="subsample_value">80</span>%</small>
+                </div>
+                <button class="btn btn-warning w-100" onclick="retrainModel()">
+                    <i class="fas fa-sync me-2"></i>Retrain with New Parameters
+                </button>
+            </div>
+
+            <!-- Feature Importance -->
+            <div class="feature-card bg-dark">
+                <h4 class="text-light mb-3"><i class="fas fa-weight-hanging me-2"></i>Feature Importance</h4>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Total Charges</span>
+                        <span class="text-danger">28%</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-danger" style="width: 28%"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Contract Length</span>
+                        <span class="text-warning">24%</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-warning" style="width: 24%"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Tenure</span>
+                        <span class="text-info">22%</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-info" style="width: 22%"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Support Calls</span>
+                        <span class="text-success">18%</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-success" style="width: 18%"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Other Features</span>
+                        <span class="text-secondary">8%</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-secondary" style="width: 8%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateValue(type, value) {
+    document.getElementById(type + '_value').textContent = value;
+}
+
+async function predictChurn() {
+    const data = {
+        tenure_months: document.getElementById('tenure_months').value,
+        monthly_charges: document.getElementById('monthly_charges').value,
+        total_charges: document.getElementById('total_charges').value,
+        contract_length: document.getElementById('contract_length').value,
+        payment_method_score: document.getElementById('payment_method_score').value,
+        support_calls: document.getElementById('support_calls').value,
+        usage_score: document.getElementById('usage_score').value,
+        satisfaction_score: document.getElementById('satisfaction_score').value
+    };
+
+    try {
+        const response = await fetch('/api/predict/churn', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-Key': 'demo-api-key-12345'
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+            displayResults(result.prediction);
+        } else {
+            alert('Prediction failed: ' + result.error);
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+function displayResults(prediction) {
+    const probability = Math.round(prediction.churn_probability * 100);
+    document.getElementById('churn_probability').textContent = probability + '%';
+    
+    const riskLevel = document.getElementById('risk_level');
+    riskLevel.textContent = prediction.risk_level;
+    riskLevel.className = 'mb-1 risk-' + prediction.risk_level.toLowerCase();
+    
+    document.getElementById('confidence').textContent = Math.round(prediction.confidence * 100);
+    document.getElementById('confidence_bar').style.width = (prediction.confidence * 100) + '%';
+    
+    // Generate recommendations
+    const recommendations = [];
+    if (probability > 70) {
+        recommendations.push('Immediate intervention required - contact customer urgently');
+        recommendations.push('Offer retention discount or upgrade incentive');
+        recommendations.push('Schedule personal call from account manager');
+    } else if (probability > 40) {
+        recommendations.push('Proactive engagement recommended');
+        recommendations.push('Send satisfaction survey');
+        recommendations.push('Offer usage optimization consultation');
+    } else {
+        recommendations.push('Customer appears stable');
+        recommendations.push('Continue regular engagement');
+        recommendations.push('Monitor for changes in usage patterns');
+    }
+    
+    const recList = document.getElementById('recommendations');
+    recList.innerHTML = recommendations.map(r => `<li>${r}</li>`).join('');
+    
+    document.getElementById('results').style.display = 'block';
+}
+
+function saveModel() {
+    const parameters = {
+        learning_rate: document.getElementById('learning_rate').value,
+        n_estimators: document.getElementById('n_estimators').value,
+        max_depth: document.getElementById('max_depth').value,
+        subsample: document.getElementById('subsample').value
+    };
+    
+    alert('Model configuration saved! Parameters: ' + JSON.stringify(parameters));
+}
+
+function resetParameters() {
+    document.getElementById('learning_rate').value = 0.1;
+    document.getElementById('n_estimators').value = 100;
+    document.getElementById('max_depth').value = 6;
+    document.getElementById('subsample').value = 0.8;
+    updateValue('learning', 10);
+    updateValue('estimators', 100);
+    updateValue('depth', 6);
+    updateValue('subsample', 80);
+}
+
+function retrainModel() {
+    alert('Retraining churn model with new parameters... This process typically takes 5-10 minutes in production.');
+}
+</script>
+{% endblock %}

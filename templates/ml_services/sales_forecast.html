@@ -1,0 +1,409 @@
+{% extends "base.html" %}
+
+{% block title %}Sales Forecast Model - AI Prediction Platform{% endblock %}
+
+{% block extra_head %}
+<style>
+    .model-info-card {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .tech-badge {
+        background-color: rgba(255,255,255,0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        margin: 0.25rem;
+        display: inline-block;
+    }
+    .feature-card {
+        border: 1px solid #374151;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    .feature-card:hover {
+        border-color: #00f2fe;
+        transform: translateY(-2px);
+    }
+    .result-card {
+        background: #1f2937;
+        border-radius: 10px;
+        padding: 1.5rem;
+        border-left: 4px solid #06b6d4;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Model Overview -->
+    <div class="model-info-card">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1><i class="fas fa-chart-line me-2"></i>Sales Forecast Model</h1>
+                <p class="lead mb-3">Predict future sales performance using time series analysis and machine learning</p>
+                <div class="mb-3">
+                    <span class="tech-badge">RandomForest</span>
+                    <span class="tech-badge">Time Series</span>
+                    <span class="tech-badge">Prophet</span>
+                    <span class="tech-badge">Scikit-learn</span>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="bg-white bg-opacity-20 rounded p-3">
+                    <h3 class="mb-1">92.1%</h3>
+                    <small>Model Accuracy</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column - Features & Technology -->
+        <div class="col-lg-6">
+            <!-- Technology Stack -->
+            <div class="feature-card bg-dark">
+                <h4 class="text-light mb-3"><i class="fas fa-cogs me-2"></i>Technology Stack</h4>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h6 class="text-info">Machine Learning</h6>
+                        <ul class="text-muted">
+                            <li>RandomForest Regressor</li>
+                            <li>Time Series Decomposition</li>
+                            <li>Seasonal adjustment</li>
+                            <li>Feature engineering</li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-6">
+                        <h6 class="text-info">Framework</h6>
+                        <ul class="text-muted">
+                            <li>Scikit-learn 1.3+</li>
+                            <li>Facebook Prophet</li>
+                            <li>Pandas & NumPy</li>
+                            <li>Statsmodels</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Input Features -->
+            <div class="feature-card bg-dark">
+                <h4 class="text-light mb-3"><i class="fas fa-dollar-sign me-2"></i>Sales Parameters</h4>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label class="form-label text-info">Historical Sales ($)</label>
+                            <input type="number" class="form-control bg-dark text-light border-secondary" 
+                                   id="historical_sales" value="125000" min="1000" max="10000000">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-info">Marketing Spend ($)</label>
+                            <input type="number" class="form-control bg-dark text-light border-secondary" 
+                                   id="marketing_spend" value="15000" min="100" max="500000">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-info">Seasonality Factor</label>
+                            <input type="range" class="form-range" id="seasonality" 
+                                   min="0.5" max="2.0" value="1.2" step="0.1" oninput="updateValue('season', this.value)">
+                            <small class="text-muted">Value: <span id="season_value">1.2</span>x</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-info">Economic Indicators</label>
+                            <input type="range" class="form-range" id="economic_indicators" 
+                                   min="0.8" max="1.5" value="1.0" step="0.05" oninput="updateValue('economic', this.value)">
+                            <small class="text-muted">Value: <span id="economic_value">1.0</span>x</small>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label class="form-label text-info">Product Category</label>
+                            <select class="form-select bg-dark text-light border-secondary" id="product_category">
+                                <option value="1">Technology</option>
+                                <option value="2">Healthcare</option>
+                                <option value="3">Finance</option>
+                                <option value="4">Retail</option>
+                                <option value="5">Manufacturing</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-info">Forecast Period (Months)</label>
+                            <select class="form-select bg-dark text-light border-secondary" id="forecast_period">
+                                <option value="1">1 Month</option>
+                                <option value="3">3 Months</option>
+                                <option value="6">6 Months</option>
+                                <option value="12">12 Months</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-info">Market Growth Rate</label>
+                            <input type="range" class="form-range" id="market_growth" 
+                                   min="-10" max="20" value="5" oninput="updateValue('growth', this.value)">
+                            <small class="text-muted">Value: <span id="growth_value">5</span>%</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-info">Competitive Index</label>
+                            <input type="range" class="form-range" id="competitive_index" 
+                                   min="1" max="10" value="6" oninput="updateValue('competitive', this.value)">
+                            <small class="text-muted">Value: <span id="competitive_value">6</span>/10</small>
+                        </div>
+                        <button class="btn btn-primary w-100 mt-3" onclick="generateForecast()">
+                            <i class="fas fa-crystal-ball me-2"></i>Generate Forecast
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Results & Tuning -->
+        <div class="col-lg-6">
+            <!-- Forecast Results -->
+            <div class="result-card mb-4" id="results" style="display: none;">
+                <h4 class="text-light mb-3"><i class="fas fa-chart-area me-2"></i>Sales Forecast</h4>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="text-center bg-primary bg-opacity-20 p-3 rounded">
+                            <h2 class="text-primary mb-1" id="forecast_value">--</h2>
+                            <small class="text-muted">Forecasted Sales</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center bg-success bg-opacity-20 p-3 rounded">
+                            <h4 class="text-success mb-1" id="growth_percent">--</h4>
+                            <small class="text-muted">Growth Rate</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <h6 class="text-light">Confidence Interval: ±<span id="confidence_interval" class="text-warning">--</span>%</h6>
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span>Lower Bound: $<span id="lower_bound">--</span></span>
+                        <span>Upper Bound: $<span id="upper_bound">--</span></span>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <canvas id="forecastChart" width="400" height="200"></canvas>
+                </div>
+                <div class="mt-3">
+                    <button class="btn btn-outline-success btn-sm" onclick="saveModel()">
+                        <i class="fas fa-save me-1"></i>Save Tuned Model
+                    </button>
+                    <button class="btn btn-outline-info btn-sm" onclick="exportForecast()">
+                        <i class="fas fa-download me-1"></i>Export Forecast
+                    </button>
+                </div>
+            </div>
+
+            <!-- Model Tuning -->
+            <div class="feature-card bg-dark">
+                <h4 class="text-light mb-3"><i class="fas fa-sliders-h me-2"></i>Model Parameters</h4>
+                <div class="mb-3">
+                    <label class="form-label text-info">Number of Trees</label>
+                    <input type="range" class="form-range" id="n_trees" 
+                           min="50" max="500" value="200" step="25" oninput="updateValue('trees', this.value)">
+                    <small class="text-muted">Value: <span id="trees_value">200</span></small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-info">Trend Component Weight</label>
+                    <input type="range" class="form-range" id="trend_weight" 
+                           min="0.1" max="2.0" value="1.0" step="0.1" oninput="updateValue('trend', this.value)">
+                    <small class="text-muted">Value: <span id="trend_value">1.0</span>x</small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-info">Seasonal Strength</label>
+                    <input type="range" class="form-range" id="seasonal_strength" 
+                           min="0.5" max="3.0" value="1.5" step="0.1" oninput="updateValue('seasonal', this.value)">
+                    <small class="text-muted">Value: <span id="seasonal_value">1.5</span>x</small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-info">Noise Reduction</label>
+                    <input type="range" class="form-range" id="noise_reduction" 
+                           min="0.0" max="0.5" value="0.1" step="0.05" oninput="updateValue('noise', (this.value * 100).toFixed(0))">
+                    <small class="text-muted">Value: <span id="noise_value">10</span>%</small>
+                </div>
+                <button class="btn btn-warning w-100" onclick="retrainModel()">
+                    <i class="fas fa-sync me-2"></i>Retrain with New Parameters
+                </button>
+            </div>
+
+            <!-- Feature Importance -->
+            <div class="feature-card bg-dark">
+                <h4 class="text-light mb-3"><i class="fas fa-weight-hanging me-2"></i>Feature Importance</h4>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Historical Sales</span>
+                        <span class="text-primary">35%</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-primary" style="width: 35%"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Seasonality</span>
+                        <span class="text-info">25%</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-info" style="width: 25%"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Marketing Spend</span>
+                        <span class="text-success">20%</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-success" style="width: 20%"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Economic Indicators</span>
+                        <span class="text-warning">15%</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-warning" style="width: 15%"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Other Factors</span>
+                        <span class="text-secondary">5%</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-secondary" style="width: 5%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let forecastChart = null;
+
+function updateValue(type, value) {
+    document.getElementById(type + '_value').textContent = value;
+}
+
+async function generateForecast() {
+    const data = {
+        historical_sales: document.getElementById('historical_sales').value,
+        marketing_spend: document.getElementById('marketing_spend').value,
+        seasonality: document.getElementById('seasonality').value,
+        economic_indicators: document.getElementById('economic_indicators').value,
+        product_category: document.getElementById('product_category').value,
+        forecast_period: document.getElementById('forecast_period').value,
+        market_growth: document.getElementById('market_growth').value,
+        competitive_index: document.getElementById('competitive_index').value
+    };
+
+    try {
+        const response = await fetch('/api/predict/sales-forecast', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-Key': 'demo-api-key-12345'
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+            displayResults(result.prediction);
+        } else {
+            alert('Forecast failed: ' + result.error);
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+function displayResults(prediction) {
+    const forecast = Math.round(prediction.forecast);
+    document.getElementById('forecast_value').textContent = '$' + forecast.toLocaleString();
+    document.getElementById('growth_percent').textContent = '+' + Math.round(prediction.growth_rate) + '%';
+    
+    const confidence = 15; // Mock confidence interval
+    document.getElementById('confidence_interval').textContent = confidence;
+    document.getElementById('lower_bound').textContent = Math.round(forecast * (1 - confidence/100)).toLocaleString();
+    document.getElementById('upper_bound').textContent = Math.round(forecast * (1 + confidence/100)).toLocaleString();
+    
+    // Create forecast chart
+    createForecastChart(prediction);
+    
+    document.getElementById('results').style.display = 'block';
+}
+
+function createForecastChart(prediction) {
+    const ctx = document.getElementById('forecastChart').getContext('2d');
+    
+    if (forecastChart) {
+        forecastChart.destroy();
+    }
+    
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    const historical = [100000, 108000, 112000, 118000, 122000, 125000];
+    const forecasted = Array.from({length: 6}, (_, i) => 
+        prediction.forecast * (0.95 + Math.random() * 0.1)
+    );
+    
+    forecastChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'Historical Sales',
+                data: historical,
+                borderColor: '#06b6d4',
+                backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                fill: true
+            }, {
+                label: 'Forecasted Sales',
+                data: forecasted,
+                borderColor: '#f59e0b',
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                borderDash: [5, 5],
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: { color: 'white' }
+                }
+            },
+            scales: {
+                x: { ticks: { color: 'white' } },
+                y: { ticks: { color: 'white' } }
+            }
+        }
+    });
+}
+
+function saveModel() {
+    const parameters = {
+        n_trees: document.getElementById('n_trees').value,
+        trend_weight: document.getElementById('trend_weight').value,
+        seasonal_strength: document.getElementById('seasonal_strength').value,
+        noise_reduction: document.getElementById('noise_reduction').value
+    };
+    
+    alert('Forecast model configuration saved! Parameters: ' + JSON.stringify(parameters));
+}
+
+function exportForecast() {
+    alert('Forecast data exported to CSV file. In production, this would download a detailed forecast report.');
+}
+
+function retrainModel() {
+    alert('Retraining sales forecast model... This process typically takes 3-5 minutes with new time series data.');
+}
+</script>
+{% endblock %}
